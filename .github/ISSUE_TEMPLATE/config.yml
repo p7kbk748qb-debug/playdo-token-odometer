@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Download and installation guide
+    url: https://github.com/p7kbk748qb-debug/playdo-token-odometer/blob/main/docs/INSTALL.md
+    about: Requirements, portable setup, taskbar pinning, checksums and upgrades.
+  - name: Security and privacy policy
+    url: https://github.com/p7kbk748qb-debug/playdo-token-odometer/security/policy
+    about: Read this before reporting sensitive issues. Never post personal Codex records publicly.

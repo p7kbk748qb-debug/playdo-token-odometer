@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://p7kbk748qb-debug.github.io/playdo-token-odometer/sitemap.xml

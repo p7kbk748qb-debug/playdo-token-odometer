@@ -1,0 +1,24 @@
+name: Feature idea
+description: Suggest an improvement to the Codex usage tracker.
+title: "[Idea]: "
+labels: [enhancement]
+body:
+  - type: textarea
+    id: need
+    attributes:
+      label: What would this help you do?
+      description: Describe the problem or workflow before the proposed feature.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed improvement
+      description: Describe the behavior, UI or example. Keep screenshots synthetic.
+    validations:
+      required: true
+  - type: textarea
+    id: tradeoffs
+    attributes:
+      label: Alternatives and tradeoffs
+      description: Optional. Consider privacy, background CPU/memory, accessibility and compatibility with small views.

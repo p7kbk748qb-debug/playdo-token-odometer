@@ -1,0 +1,13 @@
+data/
+dist/
+release/
+build/
+*.user
+*.log
+*.lnk
+docs/live-*.png
+.superpowers/
+_site/
+private/
+.env
+.env.*

@@ -1,0 +1,65 @@
+name: Bug report
+description: Report an app, usage-counting or installation problem with a safe reproduction.
+title: "[Bug]: "
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping improve PlayDo's Token Odometer. Do not attach real Codex logs, authentication files, data databases, settings, diagnostics or personal screenshots. Use synthetic examples and redact identifying paths. For a vulnerability, follow the security policy instead.
+  - type: input
+    id: version
+    attributes:
+      label: App version
+      description: Find this in Appearance & settings. Include whether you used the release ZIP or built from source.
+      placeholder: 0.2.0, release ZIP
+    validations:
+      required: true
+  - type: input
+    id: windows
+    attributes:
+      label: Windows version
+      placeholder: Windows 11 x64, display scaling 125%
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Affected area
+      options:
+        - Installation, startup or taskbar
+        - Token counts or model breakdown
+        - Appearance or window layout
+        - CSV export or clipboard
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to reproduce
+      description: Include the theme, window size and token period when relevant. Use invented usage records if needed.
+      placeholder: |
+        1. Open the app...
+        2. Select...
+        3. Observe...
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected and actual behavior
+    validations:
+      required: true
+  - type: textarea
+    id: safe-details
+    attributes:
+      label: Additional safe details
+      description: Optional synthetic screenshot, minimal invented fixture or redacted error text. Never attach a .codex folder or usage database.
+  - type: checkboxes
+    id: privacy
+    attributes:
+      label: Privacy check
+      options:
+        - label: I have not included real conversations, credentials, usage databases or identifying paths.
+          required: true
