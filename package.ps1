@@ -2,7 +2,7 @@ param([switch]$SkipBuild)
 
 $ErrorActionPreference = 'Stop'
 $root = $PSScriptRoot
-$version = '0.3.0'
+$version = '0.3.1'
 
 function Invoke-ReleaseCheck([string]$RelativePath) {
     & (Join-Path $root $RelativePath)

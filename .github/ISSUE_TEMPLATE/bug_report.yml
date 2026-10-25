@@ -12,7 +12,7 @@ body:
     attributes:
       label: App version
       description: Find this in Appearance & settings. Include whether you used the release ZIP or built from source.
-      placeholder: 0.3.0, release ZIP
+      placeholder: 0.3.1, release ZIP
     validations:
       required: true
   - type: input

@@ -6,12 +6,12 @@ Windows 10 or 11 x64, .NET Framework 4.8 and a local Codex installation that wri
 
 ## Portable package
 
-1. Download [PlayDo-Token-Odometer-0.3.0-windows-x64.zip](https://github.com/p7kbk748qb-debug/playdo-token-odometer/releases/latest/download/PlayDo-Token-Odometer-0.3.0-windows-x64.zip) and its `.sha256` file from the [official project releases](https://github.com/p7kbk748qb-debug/playdo-token-odometer/releases/latest).
+1. Download [PlayDo-Token-Odometer-0.3.1-windows-x64.zip](https://github.com/p7kbk748qb-debug/playdo-token-odometer/releases/latest/download/PlayDo-Token-Odometer-0.3.1-windows-x64.zip) and its `.sha256` file from the [official project releases](https://github.com/p7kbk748qb-debug/playdo-token-odometer/releases/latest).
 2. Optionally verify the download in PowerShell:
 
    ```powershell
-   Get-FileHash .\PlayDo-Token-Odometer-0.3.0-windows-x64.zip -Algorithm SHA256
-   Get-Content .\PlayDo-Token-Odometer-0.3.0-windows-x64.zip.sha256
+   Get-FileHash .\PlayDo-Token-Odometer-0.3.1-windows-x64.zip -Algorithm SHA256
+   Get-Content .\PlayDo-Token-Odometer-0.3.1-windows-x64.zip.sha256
    ```
 
    The hash values must match. A checksum does not authenticate a distributor; get both files from the intended maintainer.

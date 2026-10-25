@@ -11,7 +11,7 @@ Releases are portable ZIP files, not MSI installers. Publishing requires write a
    ```
 
 3. Check that Windows build and Project website workflows pass. Inspect the ZIP and its checksum. Do not add `data/`, diagnostic reports, real usage screenshots, authentication files or local notes to the repository or release.
-4. Commit the reviewed source, create a version tag such as `v0.3.0`, and push the commit and tag. Create a GitHub release targeting that exact tag. Upload only `release/PlayDo-Token-Odometer-0.3.0-windows-x64.zip` and its `.zip.sha256` file. Mark stable releases as Latest so the download buttons resolve to them.
+4. Commit the reviewed source, create a version tag such as `v0.3.1`, and push the commit and tag. Create a GitHub release targeting that exact tag. Upload only `release/PlayDo-Token-Odometer-0.3.1-windows-x64.zip` and its `.zip.sha256` file. Mark stable releases as Latest so the download buttons resolve to them.
 5. Download the public asset to a separate test folder, verify its SHA256, and confirm the extraction/run workflow. Check the README's download button and the project website.
 
 Release notes should cover requirements, extraction, starting the app, taskbar pinning, new features, known limits and upgrade instructions. Describe the app as unsigned unless a real signing process has been used. Never invent a publisher signature, successful install, benchmark, review or rating.

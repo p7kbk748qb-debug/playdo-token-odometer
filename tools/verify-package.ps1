@@ -1,7 +1,7 @@
 param([string]$Package)
 $ErrorActionPreference = 'Stop'
 $root = Split-Path $PSScriptRoot -Parent
-if (-not $Package) { $Package = Join-Path $root 'release\PlayDo-Token-Odometer-0.3.0-windows-x64.zip' }
+if (-not $Package) { $Package = Join-Path $root 'release\PlayDo-Token-Odometer-0.3.1-windows-x64.zip' }
 $Package = (Resolve-Path -LiteralPath $Package).Path
 $expectedHash = ((Get-Content -LiteralPath ($Package + '.sha256') -Raw).Trim() -split '\s+')[0]
 $actualHash = (Get-FileHash -LiteralPath $Package -Algorithm SHA256).Hash

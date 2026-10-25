@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.3.1 — 2026-10-25
+
+- Corrected the packaged README's widget guide and screenshot links so they also work outside a source checkout. Widget behavior is unchanged from 0.3.0.
+
 ## 0.3.0 — 2026-10-25
 
 - Mini and Compact have separate saved widget settings, accessible from either window without expanding the dashboard.
@@ -7,7 +11,7 @@
 - Small windows fit the enabled widgets. Missing, older and expired allowance reports are labeled; hover for the report time.
 - Existing themes, preferences, token history and taskbar identity are preserved. No new background requests or dependencies.
 
-See [small window settings](docs/SMALL-WINDOWS.md). Download the portable ZIP and checksum from [v0.3.0](https://github.com/p7kbk748qb-debug/playdo-token-odometer/releases/tag/v0.3.0).
+See [small window settings](https://github.com/p7kbk748qb-debug/playdo-token-odometer/blob/main/docs/SMALL-WINDOWS.md). Download the portable ZIP and checksum from [v0.3.0](https://github.com/p7kbk748qb-debug/playdo-token-odometer/releases/tag/v0.3.0).
 
 ## 0.2.0 — 2026-10-22
 
