@@ -15,7 +15,7 @@ using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 namespace PlayDo.Odometer {
- public sealed class Dashboard {
+ public sealed partial class Dashboard {
   public readonly Window Window;readonly Collector collector;readonly string settingsPath;readonly Settings settings;
   readonly DispatcherTimer ageTimer;volatile bool visible;int queued;string scope="Today",previous="",view="Dashboard",appearanceReturnView;
   bool paused,changingChoices,allModels;double fullWidth=1040,fullHeight=800;string actionMessage="";DateTime actionAt;
@@ -37,7 +37,8 @@ namespace PlayDo.Odometer {
    Find<ComboBox>("ViewChoice").SelectionChanged+=delegate{if(!changingChoices){appearanceReturnView=null;SetView(Convert.ToString(Find<ComboBox>("ViewChoice").SelectedItem));}};
    Click("TodayButton",delegate{SetScope("Today");});Click("WeekButton",delegate{SetScope("7 days");});Click("AllButton",delegate{SetScope("Recorded");});
    Click("CompactButton",delegate{SetView("Compact");});Click("MiniButton",delegate{SetView("Mini");});Click("ExpandButton",delegate{SetView("Dashboard");});
-   Click("CompactStyleButton",delegate{OpenAppearance();});
+   Click("CompactStyleButton",delegate{OpenSmallSettings();});
+   Click("SmallSettingsButton",delegate{OpenSmallSettings();});
    Click("SettingsButton",delegate{var panel=Find<Border>("SettingsPanel");if(panel.Visibility==Visibility.Visible)CloseSettings();else{appearanceReturnView=null;OpenSettings();}});
    Click("CloseSettingsButton",delegate{CloseSettings();});
    Click("RestorePresetButton",delegate{SelectPreset(settings.Theme);});Click("CopyButton",delegate{CopyCurrentTotal();});Click("ExportButton",delegate{ExportCurrentScope();});
@@ -105,6 +106,7 @@ namespace PlayDo.Odometer {
    Find<ScrollViewer>("FullView").Visibility=full?Visibility.Visible:Visibility.Collapsed;Find<Border>("CompactView").Visibility=full?Visibility.Collapsed:Visibility.Visible;
    Find<Border>("CompactView").Padding=new Thickness(mini?14:20,mini?10:16,mini?14:20,mini?10:16);Find<Viewbox>("CompactCounterBox").Margin=new Thickness(0,mini?5:14,0,mini?5:14);Find<TextBlock>("CompactStatus").FontSize=mini?11:12;
    Window.Width=full?fullWidth:mini?360:440;Window.Height=full?fullHeight:mini?174:260;
+   if(!full)ApplySmallLayout();
    changingChoices=true;Find<ComboBox>("ViewChoice").SelectedItem=next;changingChoices=false;
    if(save){settings.View=next;SaveSettings();}previous="";Render();
   }
@@ -140,7 +142,7 @@ namespace PlayDo.Odometer {
    Text("StatusText",s.Status);Text("ScopeLabel",scope=="Today"?"Today's reported tokens":scope=="7 days"?"Tokens across 7 days":"Tokens in local records");
    foreach(var pair in new[]{new[]{"TodayButton","Today"},new[]{"WeekButton","7 days"},new[]{"AllButton","Recorded"}}){var button=Find<Button>(pair[0]);Resource(button,Button.BackgroundProperty,scope==pair[1]?"Selected":"Control");Resource(button,Button.ForegroundProperty,scope==pair[1]?"Accent":"Text");}
    string feedback=actionMessage.Length>0&&(DateTime.UtcNow-actionAt).TotalSeconds<12?actionMessage:"";Text("ActionFeedback",feedback);
-   Text("CompactScope",(view=="Mini"?"Tokens":"Token Odometer")+" · "+scope);Text("CompactStatus",feedback.Length>0?feedback:s.Paused?"Paused · Style → Resume tracking":s.Indexing?"Importing local history…":s.LastEvent==DateTime.MinValue?(has?"Saved history · awaiting new usage":"Waiting for Codex usage"):"Last usage "+Age(s.LastEvent));RenderDigits(totals.Total,has);if(view!="Dashboard")return;
+   Text("CompactScope",(view=="Mini"?"Tokens":"Token Odometer")+" · "+scope);Text("CompactStatus",feedback.Length>0?feedback:s.Paused?"Paused · Ctrl+, to resume":s.Indexing?"Importing local history…":s.LastEvent==DateTime.MinValue?(has?"Saved history · awaiting new usage":"Waiting for Codex usage"):"Last usage "+Age(s.LastEvent));RenderDigits(totals.Total,has);if(view!="Dashboard"){RenderSmall(s,totals);return;}
    Text("TotalAccessible",has?(s.LastEvent==DateTime.MinValue?"Input + output · preserved local history; latest event unavailable":"Input + output · last usage "+Age(s.LastEvent)):"No usage imported yet. Keep Codex open while the collector starts.");Text("InputText",has?Count(totals.Input):"—");Text("OutputText",has?Count(totals.Output):"—");Text("CacheText",has?Count(totals.Cached):"—");RenderQuota(s);RenderModels(s,totals.Total);
    var chart=Find<Grid>("Chart");chart.Children.Clear();chart.ColumnDefinitions.Clear();long max=1;for(int i=0;i<7;i++){Tokens d;if(s.Days.TryGetValue(DateTime.Today.AddDays(i-6).ToString("yyyy-MM-dd"),out d))max=Math.Max(max,d.Total);}
    for(int i=0;i<7;i++){chart.ColumnDefinitions.Add(new ColumnDefinition());DateTime date=DateTime.Today.AddDays(i-6);Tokens d;long n=s.Days.TryGetValue(date.ToString("yyyy-MM-dd"),out d)?d.Total:0;var col=new Grid {Margin=new Thickness(3,0,3,0)};col.RowDefinitions.Add(new RowDefinition{Height=new GridLength(22)});col.RowDefinitions.Add(new RowDefinition());col.RowDefinitions.Add(new RowDefinition{Height=new GridLength(24)});var number=Label(Short(n),11,"Muted");number.HorizontalAlignment=HorizontalAlignment.Center;col.Children.Add(number);

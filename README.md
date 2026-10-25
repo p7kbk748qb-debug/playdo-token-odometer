@@ -6,17 +6,23 @@
 
 **See your Codex token usage, discover which models you use most, and keep a small live counter on your Windows desktop.** PlayDo's Token Odometer is a free, open-source tray app with ten visual themes, compact layouts and CSV export. It reads local Codex usage records without an API key, account sign-in or background AI calls.
 
-**[Download for Windows x64](https://github.com/p7kbk748qb-debug/playdo-token-odometer/releases/latest/download/PlayDo-Token-Odometer-0.2.0-windows-x64.zip)** · [Release notes and SHA256 checksum](https://github.com/p7kbk748qb-debug/playdo-token-odometer/releases/latest) · [Project website](https://p7kbk748qb-debug.github.io/playdo-token-odometer/)
+**[Download for Windows x64](https://github.com/p7kbk748qb-debug/playdo-token-odometer/releases/latest/download/PlayDo-Token-Odometer-0.3.0-windows-x64.zip)** · [Release notes and SHA256 checksum](https://github.com/p7kbk748qb-debug/playdo-token-odometer/releases/latest) · [Project website](https://p7kbk748qb-debug.github.io/playdo-token-odometer/)
 
 ![Winter theme: native Windows Codex usage dashboard with token odometer and model breakdown](https://raw.githubusercontent.com/p7kbk748qb-debug/playdo-token-odometer/main/assets/screenshots/winter.png)
 
 *Screenshots use synthetic example data.*
 
+Version 0.3.0 adds independent Mini and Compact widgets, with Codex allowance bars visible in both layouts. [Configure small windows](docs/SMALL-WINDOWS.md).
+
+![Mini counter with 5-hour and weekly allowance usage bars, using synthetic data](assets/screenshots/mini.png)
+
+![Compact layout with input/output totals, top model, allowance bars and reset times, using synthetic data](assets/screenshots/compact.png)
+
 ## Download and install
 
 Requires **Windows 10 or 11 x64**, **.NET Framework 4.8**, and local Codex usage records. This is a portable app; no MSI installer or administrator rights are required.
 
-1. Download the [Windows ZIP](https://github.com/p7kbk748qb-debug/playdo-token-odometer/releases/latest/download/PlayDo-Token-Odometer-0.2.0-windows-x64.zip).
+1. Download the [Windows ZIP](https://github.com/p7kbk748qb-debug/playdo-token-odometer/releases/latest/download/PlayDo-Token-Odometer-0.3.0-windows-x64.zip).
 2. Extract the entire ZIP into a writable folder you want to keep. Keep `assets` beside the executable.
 3. Open **PlayDoTokenOdometer.exe**. The first launch indexes available local history; later launches resume incremental tracking.
 
@@ -24,7 +30,7 @@ The executable is **unsigned**. Windows may show an unknown-publisher or SmartSc
 
 - **Pin:** open the app, right-click its taskbar icon, choose **Pin to taskbar**. Run the executable with `--install-shortcuts` to create or repair the Start menu and local launchers, including their matching Windows app identity. From Start, right-click **PlayDo's Token Odometer** and choose **More → Pin to taskbar**. Windows owns the final pin action.
 - **Background:** close the window; the tray icon keeps tracking. Double-click the tray icon or open the taskbar shortcut to restore it.
-- **Layouts:** select Compact (440 × 260) or Mini (360 × 174); select Expand to return. **Style** opens appearance controls from either small view, and Done takes you back.
+- **Layouts:** Mini is 360px wide; Compact is 440px wide. Both fit their enabled widgets. Select **Settings** to independently choose 5-hour and weekly usage bars, reset times, input/output totals, top model and activity status. Changes save immediately. [Small window guide](docs/SMALL-WINDOWS.md).
 - **Appearance:** open **Appearance & settings** for the preset gallery. Each preset supplies coordinated interface and number fonts, counter styling, panel geometry and static materials. Fine-tune fonts or counters, then use Restore preset styling to return to that preset's defaults. Changes preview immediately and persist across launches. Missing fonts fall back safely.
 - **Copy and export:** copy the current period's total or export its aggregate model breakdown to CSV. Exports contain scope, model and token counts; no session IDs, working folders or conversation text.
 - **Startup:** enable **Start with Windows** in Settings if wanted. It is off by default.

@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.3.0 — 2026-10-25
+
+- Mini and Compact have separate saved widget settings, accessible from either window without expanding the dashboard.
+- Show 5-hour and weekly Codex usage bars, optional reset times, input/output totals, the most-used model and activity status.
+- Small windows fit the enabled widgets. Missing, older and expired allowance reports are labeled; hover for the report time.
+- Existing themes, preferences, token history and taskbar identity are preserved. No new background requests or dependencies.
+
+See [small window settings](docs/SMALL-WINDOWS.md). Download the portable ZIP and checksum from [v0.3.0](https://github.com/p7kbk748qb-debug/playdo-token-odometer/releases/tag/v0.3.0).
+
 ## 0.2.0 — 2026-10-22
 
 - Theme Studio with ten complete appearance presets, including Winter and Hazy, with coordinated typography and counter treatments.

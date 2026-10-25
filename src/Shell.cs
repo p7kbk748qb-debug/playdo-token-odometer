@@ -8,8 +8,10 @@ using System.Windows.Interop;
 namespace PlayDo.Odometer {
  public class Settings {
   public bool Topmost,ReduceMotion;
+  public SmallViewOptions Mini=new SmallViewOptions(),Compact=new SmallViewOptions {ShowBreakdown=true,ShowModel=true,ShowReset=true};
   public string Theme="Instrument",Font="Segoe UI",NumberFont="Consolas",Counter="Mechanical",View="Dashboard";
   public void Normalize(){
+   if(Mini==null)Mini=new SmallViewOptions();if(Compact==null)Compact=new SmallViewOptions {ShowBreakdown=true,ShowModel=true,ShowReset=true};
    Theme=Appearance.Choice(Theme,Appearance.Themes);
    Font=Appearance.FontName(Font);NumberFont=NumberFont==null?"Consolas":Appearance.FontName(NumberFont);
    Counter=Appearance.Choice(Counter,Appearance.Counters);
