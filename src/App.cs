@@ -21,6 +21,7 @@ namespace PlayDo.Odometer {
    }
    string data=Option(args,"--data")??Path.Combine(root,"data","live");
    string codex=Option(args,"--codex-home")??Environment.GetEnvironmentVariable("CODEX_HOME")??Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),".codex");
+   string claude=Option(args,"--claude-home")??Environment.GetEnvironmentVariable("CLAUDE_CONFIG_DIR")??Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),".claude");
    string isolation=args.Contains("--isolated")?"."+Math.Abs(data.GetHashCode()).ToString():"";
    bool created;using(var mutex=new Mutex(true,"Local\\PlayDo.TokenOdometer"+isolation,out created))
    using(var openEvent=new EventWaitHandle(false,EventResetMode.AutoReset,"Local\\PlayDo.TokenOdometer.Open"+isolation))
@@ -31,8 +32,9 @@ namespace PlayDo.Odometer {
      Directory.CreateDirectory(data);Shell.SetIdentity();
      var app=new Application {ShutdownMode=ShutdownMode.OnExplicitShutdown};
      using(var collector=new Collector(codex,data))
+     using(var claudeCollector=new Collector(claude,data,true))
      using(var tray=new Forms.NotifyIcon()) {
-      string prefsPath=Path.Combine(data,"settings.json");var settings=Settings.Load(prefsPath);var dashboard=new Dashboard(collector,root,settings,prefsPath);app.MainWindow=dashboard.Window;
+      string prefsPath=Path.Combine(data,"settings.json");var settings=Settings.Load(prefsPath);if(Array.IndexOf(SourceTotals.Choices,settings.Source)<0){bool hasClaude=Directory.Exists(Path.Combine(claude,"projects"));bool hasCodex=Directory.Exists(Path.Combine(codex,"sessions"))||Directory.Exists(Path.Combine(codex,"archived_sessions"));settings.Source=hasClaude?(hasCodex?SourceTotals.Both:SourceTotals.Claude):SourceTotals.Codex;}var dashboard=new Dashboard(collector,root,settings,prefsPath,claudeCollector);app.MainWindow=dashboard.Window;
       tray.Icon=System.Drawing.Icon.ExtractAssociatedIcon(Assembly.GetExecutingAssembly().Location);tray.Text="PlayDo's Token Odometer";tray.Visible=true;
       var menu=new Forms.ContextMenuStrip();menu.Items.Add("Open odometer",null,(s,e)=>dashboard.Show());
       var scopeMenu=new Forms.ToolStripMenuItem("Token period");foreach(string period in new[]{"Today","7 days","Recorded"}){string selected=period;scopeMenu.DropDownItems.Add(selected,null,(s,e)=>dashboard.SetScope(selected));}menu.Items.Add(scopeMenu);
@@ -48,12 +50,12 @@ namespace PlayDo.Odometer {
       string requestedView=Option(args,"--view");if(requestedView!=null)dashboard.SetView(requestedView);
       if(args.Contains("--compact"))dashboard.SetView("Compact");
       if(args.Contains("--mini"))dashboard.SetView("Mini");
-      collector.Start();if(!args.Contains("--tray"))dashboard.Show();
+      collector.Start();claudeCollector.Start();if(!args.Contains("--tray"))dashboard.Show();
       if(args.Contains("--appearance"))dashboard.OpenAppearance();
       string capture=Option(args,"--capture");string report=Option(args,"--report");
       if(capture!=null||report!=null) {
        var timer=new DispatcherTimer {Interval=TimeSpan.FromSeconds(1)};int ticks=0;
-       timer.Tick+=delegate{ticks++;var snap=collector.GetSnapshot();if(ticks<3||((snap.Indexing||snap.Status=="Starting collector")&&ticks<180))return;timer.Stop();if(capture!=null){dashboard.Show();dashboard.Capture(capture);}if(report!=null)File.WriteAllText(report,new System.Web.Script.Serialization.JavaScriptSerializer{MaxJsonLength=1048576}.Serialize(snap));if(args.Contains("--exit-after-capture"))app.Shutdown();};timer.Start();
+       timer.Tick+=delegate{ticks++;var snap=dashboard.CurrentSnapshot();if(ticks<3||((snap.Indexing||snap.Status=="Starting collector")&&ticks<180))return;timer.Stop();if(capture!=null){dashboard.Show();dashboard.Capture(capture);}if(report!=null)File.WriteAllText(report,new System.Web.Script.Serialization.JavaScriptSerializer{MaxJsonLength=1048576}.Serialize(snap));if(args.Contains("--exit-after-capture"))app.Shutdown();};timer.Start();
       }
       app.Run();openWait.Unregister(null);exitWait.Unregister(null);menu.Dispose();
      }mutex.ReleaseMutex();return 0;

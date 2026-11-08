@@ -1,28 +1,28 @@
-# PlayDo's Token Odometer — Codex token usage tracker for Windows
+# PlayDo's Token Odometer — Codex and Claude Code token tracker for Windows
 
 [![Windows 10 / 11 x64](https://img.shields.io/badge/Windows-10%20%2F%2011%20x64-0078D4)](https://github.com/p7kbk748qb-debug/playdo-token-odometer#download-and-install)
 [![Latest release](https://img.shields.io/github/v/release/p7kbk748qb-debug/playdo-token-odometer)](https://github.com/p7kbk748qb-debug/playdo-token-odometer/releases/latest)
 [![MIT license](https://img.shields.io/badge/license-MIT-blue)](https://github.com/p7kbk748qb-debug/playdo-token-odometer/blob/main/LICENSE)
 
-**See your Codex token usage, discover which models you use most, and keep a small live counter on your Windows desktop.** PlayDo's Token Odometer is a free, open-source tray app with ten visual themes, compact layouts and CSV export. It reads local Codex usage records without an API key, account sign-in or background AI calls.
+**See your Codex and Claude Code token usage, discover which models you use most, and keep a small live counter on your Windows desktop.** PlayDo's Token Odometer is a free, open-source tray app with ten visual themes, compact layouts and CSV export. It reads local Codex and Claude Code usage records without an API key, account sign-in or background AI calls.
 
-**[Download for Windows x64](https://github.com/p7kbk748qb-debug/playdo-token-odometer/releases/latest/download/PlayDo-Token-Odometer-0.3.1-windows-x64.zip)** · [Release notes and SHA256 checksum](https://github.com/p7kbk748qb-debug/playdo-token-odometer/releases/latest) · [Project website](https://p7kbk748qb-debug.github.io/playdo-token-odometer/)
+**[Download for Windows x64](https://github.com/p7kbk748qb-debug/playdo-token-odometer/releases/latest/download/PlayDo-Token-Odometer-0.4.0-windows-x64.zip)** · [Release notes and SHA256 checksum](https://github.com/p7kbk748qb-debug/playdo-token-odometer/releases/latest) · [Project website](https://p7kbk748qb-debug.github.io/playdo-token-odometer/)
 
 ![Winter theme: native Windows Codex usage dashboard with token odometer and model breakdown](https://raw.githubusercontent.com/p7kbk748qb-debug/playdo-token-odometer/main/assets/screenshots/winter.png)
 
 *Screenshots use synthetic example data.*
 
-Version 0.3.1 adds independent Mini and Compact widgets, with Codex allowance bars visible in both layouts. [Configure small windows](https://github.com/p7kbk748qb-debug/playdo-token-odometer/blob/main/docs/SMALL-WINDOWS.md).
+Choose **Codex**, **Claude Code**, or **Codex + Claude Code** from the source picker. Mini and Compact are borderless and can sit in a screen corner with a translucent background. [Configure small windows](https://github.com/p7kbk748qb-debug/playdo-token-odometer/blob/main/docs/SMALL-WINDOWS.md).
 
-![Mini counter with 5-hour and weekly allowance usage bars, using synthetic data](https://raw.githubusercontent.com/p7kbk748qb-debug/playdo-token-odometer/main/assets/screenshots/mini.png)
+![Borderless translucent Mini widget in combined mode, using synthetic data](https://raw.githubusercontent.com/p7kbk748qb-debug/playdo-token-odometer/main/assets/screenshots/corner-widget.png)
 
 ![Compact layout with input/output totals, top model, allowance bars and reset times, using synthetic data](https://raw.githubusercontent.com/p7kbk748qb-debug/playdo-token-odometer/main/assets/screenshots/compact.png)
 
 ## Download and install
 
-Requires **Windows 10 or 11 x64**, **.NET Framework 4.8**, and local Codex usage records. This is a portable app; no MSI installer or administrator rights are required.
+Requires **Windows 10 or 11 x64**, **.NET Framework 4.8**, and local Codex or Claude Code usage records. This is a portable app; no MSI installer or administrator rights are required.
 
-1. Download the [Windows ZIP](https://github.com/p7kbk748qb-debug/playdo-token-odometer/releases/latest/download/PlayDo-Token-Odometer-0.3.1-windows-x64.zip).
+1. Download the [Windows ZIP](https://github.com/p7kbk748qb-debug/playdo-token-odometer/releases/latest/download/PlayDo-Token-Odometer-0.4.0-windows-x64.zip).
 2. Extract the entire ZIP into a writable folder you want to keep. Keep `assets` beside the executable.
 3. Open **PlayDoTokenOdometer.exe**. The first launch indexes available local history; later launches resume incremental tracking.
 
@@ -76,7 +76,9 @@ These work while the odometer window has focus.
 
 ## What the numbers mean
 
-**Tokens** are observations from local Codex `token_count` records. Input + output makes the total. Cached input is already included in input; reasoning tokens are already included in output. These can be large numbers because context is processed repeatedly during work.
+**Tokens** are observations from local Codex `token_count` records and Claude Code assistant usage records. Input + output makes the total. Cached input is already included in input; reasoning tokens are already included in output. These can be large numbers because context is processed repeatedly during work.
+
+**Claude Code** reads complete assistant usage records under the local `projects` folder, including nested subagent files. Input includes uncached input, cache reads and cache writes. The cached input column shows the read subset. Repeated snapshots of the same response count once. Claude usage is stored separately from Codex history. For Claude plan limits, use [Claude Code’s `/usage` command](https://code.claude.com/docs/en/costs#using-the-usage-command).
 
 **Today** uses the PC's local calendar date. **7 days** includes today plus the previous six dates. **Recorded** covers usage imported from available uncompressed local files. Initial indexing is shown explicitly and runs in a background worker. Later updates usually appear within about two seconds of a complete usage record, subject to Windows scheduling. Codex reports usage in batches; this is not a per-token stream.
 
@@ -150,6 +152,7 @@ Useful command-line options:
 --install-shortcuts        Create/repair local and Start menu launchers
 --exit                     Ask the existing instance to exit
 --codex-home <folder>       Use another local Codex home
+--claude-home <folder>      Use another Claude Code configuration folder
 --data <folder>             Override aggregate/settings directory
 --isolated                 Separate test instance identity
 --capture <png>             Save the app's rendered UI after indexing

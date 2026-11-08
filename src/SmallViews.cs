@@ -15,7 +15,7 @@ namespace PlayDo.Odometer {
  public sealed class AllowanceDisplay {
   public string Text,Reset,Detail;public double Used;public bool Available;
   public static AllowanceDisplay Create(Quota quota,long minutes,DateTime now) {
-   string label=minutes==300?"5-hour":"Weekly";
+   string label=minutes==300?"Codex 5-hour":"Codex weekly";
    var result=new AllowanceDisplay {Text=label+" · not reported",Reset="Reset time unavailable",Detail="Codex has not reported this allowance in local records."};
    var window=quota==null||quota.Windows==null?null:quota.Windows.FirstOrDefault(x=>x!=null&&x.Minutes==minutes);
    if(window==null)return result;
@@ -39,19 +39,19 @@ namespace PlayDo.Odometer {
   void SmallVisibility(string name,bool show){Find<FrameworkElement>(name).Visibility=show?Visibility.Visible:Visibility.Collapsed;}
   void ApplySmallLayout() {
    if(view=="Dashboard")return;var p=SmallOptions;bool mini=view=="Mini";
-   SmallVisibility("SmallPrimary",p.ShowPrimary);SmallVisibility("SmallWeekly",p.ShowWeekly);
+   SmallVisibility("SmallPrimary",IncludesCodex&&p.ShowPrimary);SmallVisibility("SmallWeekly",IncludesCodex&&p.ShowWeekly);
    SmallVisibility("SmallPrimaryReset",p.ShowReset);SmallVisibility("SmallWeeklyReset",p.ShowReset);
    SmallVisibility("SmallBreakdown",p.ShowBreakdown);SmallVisibility("SmallModel",p.ShowModel);SmallVisibility("CompactStatus",p.ShowStatus);
-   double extra=(p.ShowPrimary?40+(p.ShowReset?20:0):0)+(p.ShowWeekly?40+(p.ShowReset?20:0):0)+(p.ShowBreakdown?26:0)+(p.ShowModel?26:0);
-   Window.MinHeight=(mini?164:220)+extra-(p.ShowStatus?0:18);
-   Window.Height=(mini?174:260)+extra-(p.ShowStatus?0:18);
+   double extra=(IncludesCodex&&p.ShowPrimary?40+(p.ShowReset?20:0):0)+(IncludesCodex&&p.ShowWeekly?40+(p.ShowReset?20:0):0)+(p.ShowBreakdown?26:0)+(p.ShowModel?26:0);
+   Window.MinHeight=(mini?136:202)+extra-(p.ShowStatus?0:18);
+   Window.Height=(mini?146:218)+extra-(p.ShowStatus?0:18);PlaceCorner();
   }
   void RenderSmall(Snapshot snapshot,Tokens totals) {
    var p=SmallOptions;
    if(p.ShowBreakdown){Text("SmallBreakdown","In "+Short(totals.Input)+"   ·   Out "+Short(totals.Output));Find<TextBlock>("SmallBreakdown").ToolTip="Input "+Count(totals.Input)+" · Output "+Count(totals.Output)+" · "+scope;}
    if(p.ShowModel){var top=snapshot.Models.OrderByDescending(x=>Select(x).Total).FirstOrDefault(x=>Select(x).Total>0);string value=top==null?"Top model · no usage in "+scope.ToLowerInvariant():"Top model · "+(top.Label??top.Id)+" · "+Short(Select(top).Total);Text("SmallModel",value);Find<TextBlock>("SmallModel").ToolTip=value;}
-   if(p.ShowPrimary)RenderSmallAllowance("SmallPrimary",AllowanceDisplay.Create(snapshot.Quota,300,DateTime.UtcNow));
-   if(p.ShowWeekly)RenderSmallAllowance("SmallWeekly",AllowanceDisplay.Create(snapshot.Quota,10080,DateTime.UtcNow));
+   if(IncludesCodex&&p.ShowPrimary)RenderSmallAllowance("SmallPrimary",AllowanceDisplay.Create(snapshot.Quota,300,DateTime.UtcNow));
+   if(IncludesCodex&&p.ShowWeekly)RenderSmallAllowance("SmallWeekly",AllowanceDisplay.Create(snapshot.Quota,10080,DateTime.UtcNow));
   }
   void RenderSmallAllowance(string prefix,AllowanceDisplay value) {
    Text(prefix+"Text",value.Text);Text(prefix+"Reset",value.Reset);var bar=Find<ProgressBar>(prefix+"Bar");bar.Value=value.Used;bar.Opacity=value.Available?1:.35;
@@ -59,14 +59,17 @@ namespace PlayDo.Odometer {
   }
   public void OpenSmallSettings() {
    if(smallSettings!=null){smallSettings.Activate();return;}
-   var dialog=new Window{Title="Mini & Compact settings",Owner=Window,Width=470,Height=Math.Min(575,SystemParameters.WorkArea.Height),MinWidth=400,MinHeight=350,WindowStartupLocation=WindowStartupLocation.CenterOwner,ShowInTaskbar=false,Resources=Window.Resources,Foreground=(Brush)Window.Resources["Text"],FontFamily=Appearance.Font(settings.Font),FontSize=13,Topmost=Window.Topmost};
+   var dialog=new Window{Title="Mini & Compact settings",Owner=Window,Width=470,Height=Math.Min(750,SystemParameters.WorkArea.Height),MinWidth=400,MinHeight=350,WindowStartupLocation=WindowStartupLocation.CenterOwner,ShowInTaskbar=false,Resources=Window.Resources,Foreground=(Brush)Window.Resources["Text"],FontFamily=Appearance.Font(settings.Font),FontSize=13,Topmost=Window.Topmost};
    dialog.SetResourceReference(Window.BackgroundProperty,"Surface");smallSettings=dialog;
    var body=new StackPanel{Margin=new Thickness(24)};
    body.Children.Add(Label("Small window settings",23,"Text"));
    var help=Label("Choose what each window shows. Changes save as you go.",12,"Muted");help.TextWrapping=TextWrapping.Wrap;help.Margin=new Thickness(0,6,0,18);body.Children.Add(help);
    var selector=new ComboBox{ItemsSource=new[]{"Mini","Compact"},SelectedItem=view=="Mini"?"Mini":"Compact",Margin=new Thickness(0,0,0,16)};AutomationProperties.SetName(selector,"Window to configure");body.Children.Add(selector);
    var options=new StackPanel();body.Children.Add(options);
-   var note=Label("Allowance bars show the last Codex report. Hover for its time. Token scope does not change account allowance.",12,"Muted");note.TextWrapping=TextWrapping.Wrap;note.Margin=new Thickness(0,10,0,18);body.Children.Add(note);
+   var sourceChoice=new ComboBox{ItemsSource=SourceTotals.Choices,SelectedItem=settings.Source,Margin=new Thickness(0,0,0,12)};AutomationProperties.SetName(sourceChoice,"Usage sources");body.Children.Add(Label("Usage sources",12,"Muted"));body.Children.Add(sourceChoice);sourceChoice.SelectionChanged+=delegate{ChangeSource(sourceChoice.SelectedItem as string);};
+   var corner=new ComboBox{ItemsSource=Corners,SelectedItem=settings.Corner,Margin=new Thickness(0,0,0,12)};AutomationProperties.SetName(corner,"Screen corner");body.Children.Add(Label("Screen corner",12,"Muted"));body.Children.Add(corner);corner.SelectionChanged+=delegate{settings.Corner=corner.SelectedItem as string??"Free";SaveSettings();PlaceCorner();};
+   var glass=new CheckBox{Content="Transparent background",IsChecked=settings.Transparent,Margin=new Thickness(0,0,0,12),MinHeight=24};body.Children.Add(glass);glass.Click+=delegate{settings.Transparent=glass.IsChecked==true;SaveSettings();ApplyWindowSurface();};
+   var note=Label("Allowance bars show Codex plan usage. Claude Code contributes local tokens only.",12,"Muted");note.TextWrapping=TextWrapping.Wrap;note.Margin=new Thickness(0,10,0,18);body.Children.Add(note);
    var buttons=new WrapPanel();body.Children.Add(buttons);
    var preview=new Button{Content="Open this view",Margin=new Thickness(0,0,8,8)};buttons.Children.Add(preview);
    var style=new Button{Content="Appearance",Margin=new Thickness(0,0,8,8)};buttons.Children.Add(style);

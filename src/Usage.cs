@@ -19,7 +19,7 @@ namespace PlayDo.Odometer {
  public class BreakdownUsage {public string Id,Label;public Dictionary<string,Tokens> Days=new Dictionary<string,Tokens>();}
  public class QuotaWindow { public double Used; public long Minutes, Reset; }
  public class Quota { public DateTime At; public List<QuotaWindow> Windows = new List<QuotaWindow>(); }
- public class UsageLedger {
+ public partial class UsageLedger {
   public const string UnknownId="unknown";
   public Dictionary<string,Tokens> Days = new Dictionary<string,Tokens>();
   public Dictionary<string,BreakdownUsage> Models=new Dictionary<string,BreakdownUsage>();

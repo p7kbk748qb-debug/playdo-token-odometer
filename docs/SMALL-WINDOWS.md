@@ -1,6 +1,10 @@
 # Mini and Compact settings
 
-Open Mini or Compact and select **Settings**. You can also open **Appearance & settings → Mini & Compact settings** from the dashboard.
+Open Mini or Compact and select the **Widget settings** sliders. You can also open **Appearance & settings → Mini & Compact settings** from the dashboard.
+
+Select a **Screen corner** to place the widget inside your current monitor's work area. Drag the widget by its name to move it freely; double-click the name or select **Open dashboard** to expand it. **Transparent background** makes the panel translucent while keeping the text and controls opaque. Use **Hide to tray** to clear your desktop without stopping collection.
+
+Choose **Codex**, **Claude Code**, or **Codex + Claude Code** under **Usage sources**. The choice applies to the dashboard and both small windows. Claude-only mode hides Codex allowance bars; switching back restores your widget choices.
 
 Choose which window to configure. Each view saves its own choices immediately:
 

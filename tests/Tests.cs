@@ -14,10 +14,25 @@ class Tests {
   return "{\"type\":\"event_msg\",\"timestamp\":\""+at+"\",\"payload\":{\"type\":\"token_count\",\"info\":{\"total_token_usage\":{\"input_tokens\":"+input+",\"cached_input_tokens\":"+cached+",\"output_tokens\":"+output+",\"reasoning_output_tokens\":2},\"last_token_usage\":{\"input_tokens\":"+lastInput+",\"output_tokens\":5,\"cached_input_tokens\":0}},\"rate_limits\":"+quota+"}}";
  }
  static string E(long i,long o,string t) { return Event(i,o,t,i,0,"null"); }
+ static string Claude(string id,long output,string at,string kind="assistant"){return new JavaScriptSerializer().Serialize(new{type=kind,timestamp=at,message=new{id,model="claude-fixture",content="fixture body must not be cached",usage=new{input_tokens=9,cache_creation_input_tokens=20,cache_read_input_tokens=70,output_tokens=output}}});}
  static string Meta(string type,string at,string model,string cwd){return new JavaScriptSerializer().Serialize(new {type=type,timestamp=at,payload=new {model=model,cwd=cwd}});}
  static Tokens Group(Dictionary<string,BreakdownUsage> groups,string id,DateTime start){return UsageLedger.TotalForDays(groups[id].Days,start);}
  static int Main() {
   const string a="2026-10-17T14:00:00Z",b="2026-10-17T14:01:00Z",c="2026-10-17T14:02:00Z";
+  Check("Claude counts cache reads and writes once and ignores non-assistant records",delegate{
+   var l=new UsageLedger();l.AcceptClaude("session",Claude("msg_fixture",2,a));l.AcceptClaude("fork",Claude("msg_fixture",2,b));l.AcceptClaude("session",Claude("msg_fixture",8,c));l.AcceptClaude("session",Claude("msg_fixture",2,b));l.AcceptClaude("session",Claude("other",70,a,"user"));
+   var all=l.TotalFor(DateTime.MinValue);Eq(all.Input,99);Eq(all.Cached,70);Eq(all.Output,8);Eq(all.Total,107);Eq(l.Models["claude-fixture"].Days.Values.Sum(x=>x.Total),107);
+  });
+  Check("source selection keeps allowance separate and adds only selected tokens",delegate{
+   var codex=new Snapshot{Today=new Tokens{Input=20},Recorded=new Tokens{Input=100},Quota=new Quota()};
+   var claude=new Snapshot{Today=new Tokens{Input=50},Recorded=new Tokens{Input=180}};
+   codex.Days["2026-10-17"]=codex.Today;claude.Days["2026-10-17"]=claude.Today;
+   codex.Models.Add(new BreakdownView{Id="unknown",Label="Unknown"});claude.Models.Add(new BreakdownView{Id="unknown",Label="Unknown"});
+   var both=SourceTotals.Select(SourceTotals.Both,codex,claude);
+   Eq(both.Recorded.Total,280);Eq(both.Today.Total,70);Eq(both.Days["2026-10-17"].Total,70);Eq(codex.Days["2026-10-17"].Total,20);Eq(both.Models.Select(x=>x.Id).Distinct().Count(),2);
+   if(both.Quota!=codex.Quota||SourceTotals.Select(SourceTotals.Claude,codex,claude).Quota!=null)throw new Exception("allowance crossed provider");
+   Eq(SourceTotals.Select(SourceTotals.Codex,codex,claude).Recorded.Total,100);Eq(SourceTotals.Select(SourceTotals.Claude,codex,claude).Recorded.Total,180);
+  });
   Check("usage totals keep cached input a subset",delegate{var l=new UsageLedger();l.Accept("s",Event(100,5,a,100,80,"null"));Eq(l.TotalFor(DateTime.MinValue).Total,105);Eq(l.TotalFor(DateTime.MinValue).Cached,80);});
   Check("duplicate cumulative snapshots add zero",delegate{var l=new UsageLedger();l.Accept("s",E(100,5,a));l.Accept("s",E(100,5,b));l.Accept("s",E(150,10,c));Eq(l.TotalFor(DateTime.MinValue).Total,160);});
   Check("counter reset counts only last call",delegate{var l=new UsageLedger();l.Accept("s",E(1000,5,a));l.Accept("s",Event(300,50,b,20,0,"null"));Eq(l.TotalFor(DateTime.MinValue).Total,1030);});
@@ -90,6 +105,14 @@ class Tests {
     using(var collector=new Collector(home,data)){collector.Start();Wait(()=>collector.GetSnapshot().Models.Any(x=>x.Id=="gpt-b")&&!collector.GetSnapshot().Indexing);Eq(collector.GetSnapshot().Recorded.Total,365);Eq(collector.GetSnapshot().Models.Sum(x=>x.Recorded.Total),365);if(collector.GetSnapshot().Models.Any(x=>x.Id==UsageLedger.UnknownId))throw new Exception("recovered legacy history counted twice");}
    });
    Check("an unreadable legacy checkpoint cannot silently become an empty migrated cache",delegate{string old=Path.Combine(dir,"bad-legacy.db"),fresh=Path.Combine(dir,"bad-legacy-v3.db");using(var db=new ReplayDatabase(old))db.Save("{broken",new string[0]);byte[] before=File.ReadAllBytes(old);bool threw=false;try{using(var state=Store.Load(fresh,old)){} }catch(ArgumentException){threw=true;}if(!threw)throw new Exception("migration failure was hidden");if(!before.SequenceEqual(File.ReadAllBytes(old)))throw new Exception("legacy file changed");using(var db=new ReplayDatabase(fresh))if(db.Load()!=null)throw new Exception("empty migration checkpoint saved");});
+   Check("Claude live append and replay after restart keep one response",delegate{
+    string home=Path.Combine(dir,"claude"),logs=Path.Combine(home,"projects","fixture","subagents"),data=Path.Combine(dir,"claude-cache");Directory.CreateDirectory(logs);
+    string path=Path.Combine(logs,"agent-fixture.jsonl");File.WriteAllText(path,Claude("msg_fixture",2,a)+"\n",new UTF8Encoding(false));
+    using(var collector=new Collector(home,data,true)){collector.Start();Wait(()=>collector.GetSnapshot().Recorded.Total==101);File.AppendAllText(path,Claude("msg_fixture",8,c)+"\n");Wait(()=>collector.GetSnapshot().Recorded.Total==107);}
+    File.Copy(path,Path.Combine(logs,"copy.jsonl"));
+    using(var collector=new Collector(home,data,true)){collector.Start();Wait(()=>collector.GetSnapshot().Files==2&&!collector.GetSnapshot().Indexing);Eq(collector.GetSnapshot().Recorded.Total,107);}
+    string checkpoint=ReplayDatabase.LoadReadOnly(Path.Combine(data,"claude-usage-v1.db"));if(checkpoint.Contains("fixture body must not be cached")||checkpoint.Contains("msg_fixture"))throw new Exception("raw transcript or response ID stored");
+   });
    Check("partial newline is retried exactly once",delegate{string p=Path.Combine(dir,"split.jsonl");File.WriteAllText(p,"one\ntw",new UTF8Encoding(false));var cur=new LineCursor();int n=0;cur.Read(p,delegate(string s){n++;});Eq(n,1);Eq(cur.Offset,4);File.AppendAllText(p,"o\n",new UTF8Encoding(false));cur.Read(p,delegate(string s){n++;});Eq(n,2);Eq(cur.Offset,8);cur.Read(p,delegate(string s){n++;});Eq(n,2);});
    Check("oversized line skips safely and next line survives",delegate{string p=Path.Combine(dir,"large.jsonl");File.WriteAllText(p,new string('x',600000)+"\nok\n",new UTF8Encoding(false));var cur=new LineCursor();int n=0;cur.Read(p,delegate(string s){if(s=="ok")n++;});Eq(n,1);Eq(cur.Offset,new FileInfo(p).Length);});
    Check("truncated file starts over",delegate{string p=Path.Combine(dir,"reset.jsonl");File.WriteAllText(p,"previous\n");var cur=new LineCursor();cur.Read(p,delegate{});File.WriteAllText(p,"new\n",new UTF8Encoding(false));int n=0;cur.Read(p,delegate{n++;});Eq(n,1);Eq(cur.Offset,4);});

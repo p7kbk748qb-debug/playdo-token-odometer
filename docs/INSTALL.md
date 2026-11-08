@@ -2,23 +2,23 @@
 
 ## Requirements
 
-Windows 10 or 11 x64, .NET Framework 4.8 and a local Codex installation that writes usage records. The app needs no API key, administrator rights, Node server or font downloads. Model and token totals depend on the local records available on this PC.
+Windows 10 or 11 x64, .NET Framework 4.8 and a local Codex or Claude Code installation that writes usage records. The app needs no API key, administrator rights, Node server or font downloads. Model and token totals depend on the local records available on this PC.
 
 ## Portable package
 
-1. Download [PlayDo-Token-Odometer-0.3.1-windows-x64.zip](https://github.com/p7kbk748qb-debug/playdo-token-odometer/releases/latest/download/PlayDo-Token-Odometer-0.3.1-windows-x64.zip) and its `.sha256` file from the [official project releases](https://github.com/p7kbk748qb-debug/playdo-token-odometer/releases/latest).
+1. Download [PlayDo-Token-Odometer-0.4.0-windows-x64.zip](https://github.com/p7kbk748qb-debug/playdo-token-odometer/releases/latest/download/PlayDo-Token-Odometer-0.4.0-windows-x64.zip) and its `.sha256` file from the [official project releases](https://github.com/p7kbk748qb-debug/playdo-token-odometer/releases/latest).
 2. Optionally verify the download in PowerShell:
 
    ```powershell
-   Get-FileHash .\PlayDo-Token-Odometer-0.3.1-windows-x64.zip -Algorithm SHA256
-   Get-Content .\PlayDo-Token-Odometer-0.3.1-windows-x64.zip.sha256
+   Get-FileHash .\PlayDo-Token-Odometer-0.4.0-windows-x64.zip -Algorithm SHA256
+   Get-Content .\PlayDo-Token-Odometer-0.4.0-windows-x64.zip.sha256
    ```
 
    The hash values must match. A checksum does not authenticate a distributor; get both files from the intended maintainer.
 3. Extract the entire ZIP into a writable folder you control, for example a folder under Documents. Do not run the app directly inside the ZIP or place it in a protected system directory.
 4. Double-click `PlayDoTokenOdometer.exe`. Keep the `assets` folder beside it. This portable executable is unsigned. Windows may show an unknown-publisher or SmartScreen notice; review the source and release provenance before deciding whether to run it.
 
-The portable app creates `data/live` beside its executable. It contains local aggregates and settings. The initial import can take longer than later launches; live updates follow complete Codex usage records.
+The portable app creates `data/live` beside its executable. It contains local aggregates and settings. The initial import can take longer than later launches; live updates follow complete local usage records.
 
 ## Custom Codex location
 
@@ -29,6 +29,8 @@ By default, the app reads the `CODEX_HOME` environment variable, or `%USERPROFIL
 ```
 
 Exit the existing instance before changing the source folder. The folder must be a Codex home containing its session records, not an individual JSONL file. This option changes the source for that launch; repeat it in a shortcut's target arguments if you want to keep using it. Use `--data "D:\OdometerData"` for a separate writable cache/settings location when needed.
+
+For Claude Code, the app reads `projects/**/*.jsonl` under `CLAUDE_CONFIG_DIR` or, by default, `%USERPROFILE%\.claude`. Override the configuration directory with `--claude-home "D:\MyClaudeHome"`. Select **Claude Code** in **Usage sources** if you only use Claude. The separate Claude checkpoint does not replace your existing Codex history.
 
 ## Start menu and taskbar
 

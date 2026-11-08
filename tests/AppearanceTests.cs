@@ -50,9 +50,36 @@ class AppearanceTests {
    Session(Path.Combine(home,"sessions","demo.jsonl"),"C:\\Demo\\Odometer","demo-model",12000,350,DateTime.UtcNow);
    Session(Path.Combine(home,"sessions","second.jsonl"),"C:\\Other\\Odometer","other-model",800,25,DateTime.UtcNow.AddSeconds(-1));
    Session(Path.Combine(home,"sessions","older.jsonl"),"C:\\Demo\\Odometer","earlier-model",700,25,DateTime.UtcNow.AddDays(-8));
-   using(var collector=new Collector(home,data)){
+   Directory.CreateDirectory(Path.Combine(home,"projects"));
+   File.WriteAllText(Path.Combine(home,"projects","sample.jsonl"),new JavaScriptSerializer().Serialize(new{type="assistant",timestamp=now,message=new{id="msg_fixture",model="claude-fixture",usage=new{input_tokens=9,cache_creation_input_tokens=20,cache_read_input_tokens=70,output_tokens=8}}})+"\n");
+   using(var collector=new Collector(home,data))
+   using(var claude=new Collector(home,data,true)){
     collector.Start();var deadline=DateTime.UtcNow.AddSeconds(15);while((collector.GetSnapshot().Recorded.Total==0||collector.GetSnapshot().Indexing)&&DateTime.UtcNow<deadline)Thread.Sleep(50);
-    var prefs=new Settings();var dashboard=new Dashboard(collector,root,prefs,prefsPath);dashboard.Show();Pump();
+    var prefs=new Settings();var dashboard=new Dashboard(collector,root,prefs,prefsPath,claude);claude.Start();dashboard.Show();Pump();
+    Check("source picker drives totals, model labels and allowance visibility",delegate{
+     var picker=Choice(dashboard,"UsageSourceChoice");
+     picker.SelectedItem=SourceTotals.Claude;
+     var until=DateTime.UtcNow.AddSeconds(10);while(claude.GetSnapshot().Recorded.Total!=107&&DateTime.UtcNow<until)Thread.Sleep(50);
+     Pump();Assert(dashboard.CurrentSnapshot().Today.Total==107,"Claude-only token total wrong");
+     Assert(((Border)dashboard.Window.FindName("QuotaPanel")).Visibility==Visibility.Collapsed,"Codex allowance in Claude-only dashboard");
+     dashboard.SetView("Mini");Pump();Assert(((StackPanel)dashboard.Window.FindName("SmallPrimary")).Visibility==Visibility.Collapsed,"Codex allowance in Claude-only widget");
+     picker.SelectedItem=SourceTotals.Both;Pump();Assert(dashboard.CurrentSnapshot().Today.Total==13282,"Combined total wrong");
+     Assert(dashboard.CurrentSnapshot().Models.Any(x=>x.Label=="Claude Code · claude-fixture"),"Combined model lost provider");
+     Assert(Settings.Load(prefsPath).Source==SourceTotals.Both,"Source did not persist");
+     prefs.Transparent=true;dashboard.SetView("Mini");Pump();dashboard.Capture(Path.Combine(root,"build","corner-both.png"));prefs.Transparent=false;
+     picker.SelectedItem=SourceTotals.Codex;dashboard.SetView("Dashboard");Pump();Assert(dashboard.CurrentSnapshot().Today.Total==13175,"Codex-only token total wrong");
+    });
+    Check("corner mode is borderless, translucent and reversible",delegate{
+     prefs.Transparent=true;prefs.Corner="Bottom right";dashboard.SetView("Mini");Pump();
+     Assert(dashboard.Window.WindowStyle==WindowStyle.None&&dashboard.Window.AllowsTransparency,"Native chrome still visible");
+     Assert(((FrameworkElement)dashboard.Window.FindName("DashboardChrome")).Visibility==Visibility.Collapsed,"Dashboard bar still visible");
+     var brush=(SolidColorBrush)((Border)dashboard.Window.FindName("CompactView")).Background;Assert(brush.Color.A>0&&brush.Color.A<255,"Panel is not translucent");
+     var position=Dashboard.CornerBounds(new Rect(-1920,0,1920,1040),new Size(360,230),"Bottom right",12);Assert(position==new Point(-372,798),"Corner ignored monitor work area");
+     dashboard.Capture(Path.Combine(root,"build","corner-transparent.png"));
+     var saved=Settings.Load(prefsPath);Assert(saved.Transparent&&saved.Corner=="Bottom right","Corner preferences did not persist");
+     Press(dashboard,"HideSmallButton");Assert(!dashboard.Window.IsVisible,"Hide did not return widget to tray");dashboard.Show();
+     prefs.Corner="Free";prefs.Transparent=false;dashboard.SetView("Dashboard");Pump();Assert(((FrameworkElement)dashboard.Window.FindName("DashboardChrome")).Visibility==Visibility.Visible,"Dashboard chrome was not restored");
+    });
     Check("small widgets size to content and track token scope",delegate{
      prefs.Mini.ShowBreakdown=true;prefs.Mini.ShowModel=true;dashboard.SetView("Mini");Pump();Assert(Read(dashboard,"SmallBreakdown").Contains("12.8K")&&Read(dashboard,"SmallModel").Contains("demo-model"),"Scope widgets missing");Assert(Read(dashboard,"SmallPrimaryText").Contains("not reported"),"Missing allowance mislabeled");double height=dashboard.Window.Height;prefs.Mini.ShowWeekly=false;dashboard.SetView("Mini");Pump();Assert(dashboard.Window.Height<height&&((StackPanel)dashboard.Window.FindName("SmallWeekly")).Visibility==Visibility.Collapsed,"Hidden widget still takes space");Assert(prefs.Compact.ShowWeekly,"Mini changed Compact preferences");dashboard.SetScope("Recorded");Assert(Read(dashboard,"SmallBreakdown").Contains("13.5K"),"Small totals ignored scope");prefs.Mini=new SmallViewOptions();dashboard.SetScope("Today");dashboard.SetView("Dashboard");
     });
@@ -65,7 +92,7 @@ class AppearanceTests {
     });
     Check("appearance controls exist and presets change the window",delegate{
      var theme=Choice(dashboard,"ThemeChoice");var font=Choice(dashboard,"FontChoice");Choice(dashboard,"CounterChoice");Choice(dashboard,"ViewChoice");
-     string before=dashboard.Window.Background.ToString();theme.SelectedItem="Arctic";Pump();Assert(dashboard.Window.Background.ToString()!=before,"Arctic did not change the background");font.SelectedItem="Consolas";Pump();Assert(dashboard.Window.FontFamily.Source.IndexOf("Consolas",StringComparison.OrdinalIgnoreCase)>=0,"Font did not apply");
+     string before=((ScrollViewer)dashboard.Window.FindName("FullView")).Background.ToString();theme.SelectedItem="Arctic";Pump();Assert(dashboard.Window.Background.ToString()!=before,"Arctic did not change the background");font.SelectedItem="Consolas";Pump();Assert(dashboard.Window.FontFamily.Source.IndexOf("Consolas",StringComparison.OrdinalIgnoreCase)>=0,"Font did not apply");
     });
     Check("all presets render and save without resetting selection",delegate{
      foreach(string theme in Appearance.Themes){dashboard.SelectPreset(theme);Pump();dashboard.Capture(Path.Combine(root,"build","appearance-"+theme.ToLowerInvariant()+".png"));Assert((string)Field(Settings.Load(prefsPath),"Theme")==theme,"Theme did not persist");foreach(var pair in new[]{new[]{"Text","Canvas"},new[]{"Text","Surface"},new[]{"Text","SurfaceAlt"},new[]{"Text","Control"},new[]{"Text","Hover"},new[]{"Text","Pressed"},new[]{"Muted","Surface"},new[]{"Muted","SurfaceAlt"},new[]{"Accent","Surface"},new[]{"Accent","Digit"},new[]{"Accent","Selected"},new[]{"OnAccent","Accent"}})Assert(Contrast(dashboard,pair[0],pair[1])>=4.5,theme+" contrast too low: "+pair[0]+"/"+pair[1]);}

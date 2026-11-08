@@ -1,7 +1,7 @@
 param([string]$Package)
 $ErrorActionPreference = 'Stop'
 $root = Split-Path $PSScriptRoot -Parent
-if (-not $Package) { $Package = Join-Path $root 'release\PlayDo-Token-Odometer-0.3.1-windows-x64.zip' }
+if (-not $Package) { $Package = Join-Path $root 'release\PlayDo-Token-Odometer-0.4.0-windows-x64.zip' }
 $Package = (Resolve-Path -LiteralPath $Package).Path
 $expectedHash = ((Get-Content -LiteralPath ($Package + '.sha256') -Raw).Trim() -split '\s+')[0]
 $actualHash = (Get-FileHash -LiteralPath $Package -Algorithm SHA256).Hash
@@ -33,7 +33,7 @@ $fixture = ($records | ForEach-Object { ConvertTo-Json -InputObject $_ -Depth 8 
 $exe = Join-Path $portable 'PlayDoTokenOdometer.exe'
 $report = Join-Path $testRoot 'snapshot.json'
 $capture = Join-Path $testRoot 'portable.png'
-$arguments = '--isolated --codex-home "' + $fixtureHome + '" --report "' + $report + '" --capture "' + $capture + '" --exit-after-capture'
+$arguments = '--isolated --codex-home "' + $fixtureHome + '" --claude-home "' + $fixtureHome + '" --report "' + $report + '" --capture "' + $capture + '" --exit-after-capture'
 $process = Start-Process -FilePath $exe -ArgumentList $arguments -WindowStyle Hidden -PassThru
 if (-not $process.WaitForExit(30000)) {
     Stop-Process -Id $process.Id

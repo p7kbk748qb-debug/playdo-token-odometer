@@ -10,7 +10,7 @@ namespace PlayDo.Odometer {
   public void Dispose(){if(Ledger.Replay!=null){Ledger.Replay.Dispose();Ledger.Replay=null;}if(Ledger.LegacyReplay!=null){Ledger.LegacyReplay.Dispose();Ledger.LegacyReplay=null;}}
  }
  public static class Store {
-  public static bool Recovered;
+  [ThreadStatic] public static bool Recovered;
   private static JavaScriptSerializer Serializer() {return new JavaScriptSerializer {MaxJsonLength=64*1024*1024,RecursionLimit=64};}
   public static SavedState Load(string path) {return Load(path,null);}
   public static SavedState Load(string path,string legacyPath) {

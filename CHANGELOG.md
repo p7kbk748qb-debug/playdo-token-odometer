@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.4.0 — 2026-11-08
+
+- Choose Codex, Claude Code, or both in the token counter, model breakdown and CSV export.
+- Claude Code imports local assistant usage, including cache reads and writes, and deduplicates repeated responses across files and restarts.
+- Mini and Compact have no separate title bar. Dock them to a screen corner or drag them freely, and optionally let the desktop show through the panel.
+- Codex allowance remains a separate local snapshot. Claude Code plan allowance is not inferred from tokens.
+
 ## 0.3.1 — 2026-10-25
 
 - Corrected the packaged README's widget guide and screenshot links so they also work outside a source checkout. Widget behavior is unchanged from 0.3.0.

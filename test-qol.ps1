@@ -2,7 +2,7 @@ $ErrorActionPreference = 'Stop'
 $root = $PSScriptRoot
 $compiler = Join-Path $env:WINDIR 'Microsoft.NET\Framework64\v4.0.30319\csc.exe'
 New-Item -ItemType Directory -Force -Path (Join-Path $root 'build') | Out-Null
-$sources = @('Usage.cs','LineCursor.cs','Store.cs','Collector.cs','ReplayDatabase.cs','Convenience.cs') |
+$sources = @('Usage.cs','ClaudeUsage.cs','LineCursor.cs','Store.cs','Collector.cs','ReplayDatabase.cs','Convenience.cs') |
     ForEach-Object { Join-Path $root ('src\' + $_) } |
     Where-Object { Test-Path -LiteralPath $_ }
 $sources += Join-Path $root 'tests\ConvenienceTests.cs'
