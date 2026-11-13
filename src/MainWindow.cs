@@ -44,19 +44,21 @@ namespace PlayDo.Odometer {
    Click("RestorePresetButton",delegate{SelectPreset(settings.Theme);});Click("CopyButton",delegate{CopyCurrentTotal();});Click("ExportButton",delegate{ExportCurrentScope();});
    var compactMenu=new ContextMenu{Resources=Window.Resources};foreach(string option in new[]{"Today","7 days","Recorded"}){string selected=option;var item=new MenuItem{Header=option};item.Click+=delegate{SetScope(selected);};compactMenu.Items.Add(item);}
    compactMenu.Items.Add(new Separator());var copyItem=new MenuItem{Header="Copy total    Ctrl+Shift+C"};copyItem.Click+=delegate{CopyCurrentTotal();};compactMenu.Items.Add(copyItem);var exportItem=new MenuItem{Header="Export CSV    Ctrl+E"};exportItem.Click+=delegate{ExportCurrentScope();};compactMenu.Items.Add(exportItem);var styleItem=new MenuItem{Header="Style studio    Ctrl+,"};styleItem.Click+=delegate{OpenAppearance();};compactMenu.Items.Add(styleItem);Find<Border>("CompactView").ContextMenu=compactMenu;
+   InitializeTiny();
    Click("CompactMenuButton",delegate{compactMenu.PlacementTarget=Find<Button>("CompactMenuButton");compactMenu.Placement=PlacementMode.Bottom;compactMenu.IsOpen=true;});
    Window.PreviewKeyDown+=delegate(object sender,KeyEventArgs e){if(HandleShortcut(e.Key,Keyboard.Modifiers))e.Handled=true;};
    Text("AboutText","PlayDo's Token Odometer · "+typeof(Dashboard).Assembly.GetName().Version.ToString(3)+" · local, private and portable");
    Click("MoreModelsButton",delegate{allModels=!allModels;Render();});
    Click("PauseButton",delegate{TogglePause();});Click("RescanButton",delegate{collector.Refresh();if(claudeCollector!=null)claudeCollector.Refresh();});Click("FolderButton",delegate{System.Diagnostics.Process.Start("explorer.exe","\""+root+"\"");});Click("ExitButton",delegate{if(ExitRequested!=null)ExitRequested();});
    Find<CheckBox>("TopmostCheck").IsChecked=prefs.Topmost;Window.Topmost=prefs.Topmost;
+   Find<CheckBox>("AnimateCheck").IsChecked=prefs.AnimateCount;Find<CheckBox>("AnimateCheck").Click+=delegate{settings.AnimateCount=Find<CheckBox>("AnimateCheck").IsChecked==true;SettleNumber();SaveSettings();};
    Find<CheckBox>("MotionCheck").IsChecked=prefs.ReduceMotion;Find<CheckBox>("StartupCheck").IsChecked=Shell.StartupEnabled();
    Find<CheckBox>("TopmostCheck").Click+=delegate{settings.Topmost=Find<CheckBox>("TopmostCheck").IsChecked==true;Window.Topmost=settings.Topmost;SaveSettings();};
-   Find<CheckBox>("MotionCheck").Click+=delegate{settings.ReduceMotion=Find<CheckBox>("MotionCheck").IsChecked==true;SaveSettings();};
+   Find<CheckBox>("MotionCheck").Click+=delegate{settings.ReduceMotion=Find<CheckBox>("MotionCheck").IsChecked==true;SettleNumber();SaveSettings();};
    Find<CheckBox>("StartupCheck").Click+=delegate{try{Shell.SetStartup(Find<CheckBox>("StartupCheck").IsChecked==true);Text("SettingsNote","Startup preference saved. Closing the window keeps tracking in the tray.");}catch{Find<CheckBox>("StartupCheck").IsChecked=Shell.StartupEnabled();Text("SettingsNote","Windows could not save the startup shortcut. You can still open the app normally.");}};
    ageTimer=new DispatcherTimer {Interval=TimeSpan.FromMinutes(1)};ageTimer.Tick+=delegate{Render();};
-   Window.IsVisibleChanged+=delegate{visible=Window.IsVisible&&Window.WindowState!=WindowState.Minimized;if(visible){Render();ageTimer.Start();}else ageTimer.Stop();};
-   Window.StateChanged+=delegate{visible=Window.IsVisible&&Window.WindowState!=WindowState.Minimized;if(visible){ageTimer.Start();Render();}else ageTimer.Stop();};
+   Window.IsVisibleChanged+=delegate{visible=Window.IsVisible&&Window.WindowState!=WindowState.Minimized;if(visible){Render();ageTimer.Start();}else {ageTimer.Stop();SettleNumber();}};
+   Window.StateChanged+=delegate{visible=Window.IsVisible&&Window.WindowState!=WindowState.Minimized;if(visible){ageTimer.Start();Render();}else {ageTimer.Stop();SettleNumber();}};
    Action onUsage=delegate{if(!visible||Interlocked.Exchange(ref queued,1)!=0)return;Window.Dispatcher.BeginInvoke(new Action(delegate{Interlocked.Exchange(ref queued,0);if(visible)Render();}),DispatcherPriority.Background);};collector.Changed+=onUsage;if(claudeCollector!=null)claudeCollector.Changed+=onUsage;
    Window.SourceInitialized+=delegate{Shell.TitleBar(Window,Appearance.Get(settings.Theme).Dark);};Window.SizeChanged+=delegate{AdaptHeader();};
   }
@@ -91,7 +93,7 @@ namespace PlayDo.Odometer {
   public bool HandleShortcut(Key key,ModifierKeys modifiers){
    if(key==Key.Escape&&modifiers==ModifierKeys.None&&Find<Border>("SettingsPanel").Visibility==Visibility.Visible){CloseSettings();return true;}
    if(modifiers==ModifierKeys.Control){if(key==Key.D1||key==Key.NumPad1){SetScope("Today");return true;}if(key==Key.D2||key==Key.NumPad2){SetScope("7 days");return true;}if(key==Key.D3||key==Key.NumPad3){SetScope("Recorded");return true;}if(key==Key.OemComma){OpenAppearance();return true;}if(key==Key.M){ToggleCompact();return true;}if(key==Key.E){ExportCurrentScope();return true;}}
-   if(modifiers==(ModifierKeys.Control|ModifierKeys.Shift)){if(key==Key.C){CopyCurrentTotal();return true;}if(key==Key.M){SetView("Mini");return true;}}return false;
+   if(modifiers==(ModifierKeys.Control|ModifierKeys.Shift)){if(key==Key.C){CopyCurrentTotal();return true;}if(key==Key.M){SetView("Mini");return true;}if(key==Key.T){SetView("Tiny");return true;}}return false;
   }
   void SaveSettings(){try{settings.Save(settingsPath);}catch{Text("SettingsNote","Could not save preferences. Check the app folder permissions.");}}
   public void TogglePause(){paused=!paused;ApplySourcePause();Find<Button>("PauseButton").Content=paused?"Resume tracking":"Pause tracking";}
@@ -101,11 +103,11 @@ namespace PlayDo.Odometer {
   public void SetView(string requested){appearanceReturnView=null;ApplyView(requested,true);}
   void ApplyView(string requested,bool save) {
    bool wasSmall=view!="Dashboard";string next=Appearance.Choice(requested,Appearance.Views);if(view=="Dashboard"&&next!="Dashboard"){fullWidth=Window.Width;fullHeight=Window.Height;}
-   view=next;bool full=next=="Dashboard",mini=next=="Mini";if(!full&&Window.WindowState!=WindowState.Normal)Window.WindowState=WindowState.Normal;
-   Window.MinWidth=full?760:mini?340:380;Window.MinHeight=full?640:mini?164:220;
-   Find<ScrollViewer>("FullView").Visibility=full?Visibility.Visible:Visibility.Collapsed;Find<Border>("CompactView").Visibility=full?Visibility.Collapsed:Visibility.Visible;
+   view=next;bool full=next=="Dashboard",mini=next=="Mini",tiny=next=="Tiny";if(!full&&Window.WindowState!=WindowState.Normal)Window.WindowState=WindowState.Normal;
+   Window.MinWidth=full?760:tiny?220:mini?340:380;Window.MinHeight=full?640:tiny?52:mini?164:220;
+   Find<ScrollViewer>("FullView").Visibility=full?Visibility.Visible:Visibility.Collapsed;Find<Border>("CompactView").Visibility=full||tiny?Visibility.Collapsed:Visibility.Visible;SmallVisibility("TinyView",tiny);
    Find<Border>("CompactView").Padding=new Thickness(mini?14:20,mini?10:16,mini?14:20,mini?10:16);Find<Viewbox>("CompactCounterBox").Margin=new Thickness(0,mini?5:14,0,mini?5:14);Find<TextBlock>("CompactStatus").FontSize=mini?11:12;
-   Window.Width=full?fullWidth:mini?360:440;Window.Height=full?fullHeight:mini?174:260;
+   Window.Width=full?fullWidth:tiny?300:mini?360:440;Window.Height=full?fullHeight:tiny?68:mini?174:260;
    ApplyWindowSurface();if(!full)ApplySmallLayout();else if(wasSmall&&Window.IsVisible)Window.Dispatcher.BeginInvoke(new Action(CenterDashboard),DispatcherPriority.Loaded);
    changingChoices=true;Find<ComboBox>("ViewChoice").SelectedItem=next;changingChoices=false;
    if(save){settings.View=next;SaveSettings();}previous="";Render();
@@ -115,9 +117,7 @@ namespace PlayDo.Odometer {
   static string Age(DateTime at){double min=Math.Max(0,(DateTime.UtcNow-at.ToUniversalTime()).TotalMinutes);return min<1?"just now":min<60?((int)min)+"m ago":min<1440?((int)(min/60))+"h ago":((int)(min/1440))+"d ago";}
   Tokens Select(BreakdownView item){return item==null?new Tokens():scope=="Today"?item.Today:scope=="7 days"?item.Week:item.Recorded;}
   void RenderDigits(long n,bool hasData) {
-   string value=hasData?Count(n):"—",key=view+"|"+settings.Theme+"|"+settings.Counter+"|"+settings.NumberFont+"|"+value;if(previous==key)return;previous=key;
-   var row=Find<StackPanel>(view=="Dashboard"?"Digits":"CompactDigits");row.Children.Clear();row.Children.Add(Appearance.Counter(settings,value,false));
-   AutomationProperties.SetName(row,hasData?Count(n)+" tokens":"No usage recorded yet");
+   UpdateNumber(n,hasData);
   }
   void RenderQuota(Snapshot s) {
    var q=s.Quota;if(q==null||q.Windows.Count==0){Text("QuotaValue","Not yet reported");Text("QuotaTitle","Codex allowance");Text("QuotaAge","No snapshot");Text("QuotaReset","A quota snapshot appears when Codex reports one.");Text("QuotaExtra","Reported separately from tokens");Find<ProgressBar>("QuotaBar").Value=0;return;}
@@ -142,7 +142,7 @@ namespace PlayDo.Odometer {
    Text("StatusText",s.Status);Text("ScopeLabel",scope=="Today"?"Today's reported tokens":scope=="7 days"?"Tokens across 7 days":"Tokens in local records");
    foreach(var pair in new[]{new[]{"TodayButton","Today"},new[]{"WeekButton","7 days"},new[]{"AllButton","Recorded"}}){var button=Find<Button>(pair[0]);Resource(button,Button.BackgroundProperty,scope==pair[1]?"Selected":"Control");Resource(button,Button.ForegroundProperty,scope==pair[1]?"Accent":"Text");}
    string feedback=actionMessage.Length>0&&(DateTime.UtcNow-actionAt).TotalSeconds<12?actionMessage:"";Text("ActionFeedback",feedback);
-   Text("CompactScope",scope+" · "+(settings.Source==SourceTotals.Both?"Both sources":settings.Source));Text("CompactStatus",feedback.Length>0?feedback:s.Paused?"Paused · Ctrl+, to resume":s.Indexing?"Importing local history…":s.LastEvent==DateTime.MinValue?(has?"Saved history · awaiting new usage":"Waiting for local usage"):"Last usage "+Age(s.LastEvent));RenderDigits(totals.Total,has);if(view!="Dashboard"){RenderSmall(s,totals);return;}
+   Text("CompactScope",scope+" · "+(settings.Source==SourceTotals.Both?"Both sources":settings.Source));Text("CompactStatus",feedback.Length>0?feedback:s.Paused?"Paused · Ctrl+, to resume":s.Indexing?"Importing local history…":s.LastEvent==DateTime.MinValue?(has?"Saved history · awaiting new usage":"Waiting for local usage"):"Last usage "+Age(s.LastEvent));RenderDigits(totals.Total,has);if(view!="Dashboard"){if(view=="Tiny"){Find<Border>("TinyView").ToolTip=Count(totals.Total)+" tokens · "+scope+" · "+settings.Source+(s.Paused?" · paused":s.Indexing?" · importing":"");}else RenderSmall(s,totals);return;}
    Text("TotalAccessible",has?(s.LastEvent==DateTime.MinValue?"Input + output · preserved local history; latest event unavailable":"Input + output · last usage "+Age(s.LastEvent)):"No usage imported yet. Run Codex or Claude Code to record usage.");Text("InputText",has?Count(totals.Input):"—");Text("OutputText",has?Count(totals.Output):"—");Text("CacheText",has?Count(totals.Cached):"—");SmallVisibility("QuotaPanel",IncludesCodex);if(IncludesCodex)RenderQuota(s);RenderModels(s,totals.Total);
    var chart=Find<Grid>("Chart");chart.Children.Clear();chart.ColumnDefinitions.Clear();long max=1;for(int i=0;i<7;i++){Tokens d;if(s.Days.TryGetValue(DateTime.Today.AddDays(i-6).ToString("yyyy-MM-dd"),out d))max=Math.Max(max,d.Total);}
    for(int i=0;i<7;i++){chart.ColumnDefinitions.Add(new ColumnDefinition());DateTime date=DateTime.Today.AddDays(i-6);Tokens d;long n=s.Days.TryGetValue(date.ToString("yyyy-MM-dd"),out d)?d.Total:0;var col=new Grid {Margin=new Thickness(3,0,3,0)};col.RowDefinitions.Add(new RowDefinition{Height=new GridLength(22)});col.RowDefinitions.Add(new RowDefinition());col.RowDefinitions.Add(new RowDefinition{Height=new GridLength(24)});var number=Label(Short(n),11,"Muted");number.HorizontalAlignment=HorizontalAlignment.Center;col.Children.Add(number);

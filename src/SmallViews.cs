@@ -38,7 +38,7 @@ namespace PlayDo.Odometer {
   SmallViewOptions SmallOptions {get{return view=="Mini"?settings.Mini:settings.Compact;}}
   void SmallVisibility(string name,bool show){Find<FrameworkElement>(name).Visibility=show?Visibility.Visible:Visibility.Collapsed;}
   void ApplySmallLayout() {
-   if(view=="Dashboard")return;var p=SmallOptions;bool mini=view=="Mini";
+   if(view=="Dashboard"||view=="Tiny")return;var p=SmallOptions;bool mini=view=="Mini";
    SmallVisibility("SmallPrimary",IncludesCodex&&p.ShowPrimary);SmallVisibility("SmallWeekly",IncludesCodex&&p.ShowWeekly);
    SmallVisibility("SmallPrimaryReset",p.ShowReset);SmallVisibility("SmallWeeklyReset",p.ShowReset);
    SmallVisibility("SmallBreakdown",p.ShowBreakdown);SmallVisibility("SmallModel",p.ShowModel);SmallVisibility("CompactStatus",p.ShowStatus);

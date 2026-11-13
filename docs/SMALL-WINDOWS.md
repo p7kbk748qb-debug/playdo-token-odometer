@@ -1,5 +1,13 @@
 # Mini and Compact settings
 
+## Tiny
+
+Tiny is a 300 × 68 DIP panel that shows the exact selected token count. Open **Tiny** from the dashboard, tray or window picker, or press **Ctrl+Shift+T**. Drag anywhere on the number or background. The two small controls in the top right hide it to the tray or expand to the dashboard. Double-click the background to expand.
+
+Right-click for Today / 7 days / Recorded, copy, CSV export and Appearance. Existing source selection, transparency, theme and corner preferences apply. Tiny deliberately omits widget rows and branding so the count stays readable. Long totals scale down to fit without rounding.
+
+Enable **Animate token increases** in Appearance for a brief tick-up when new usage arrives. It is off by default, never animates first load or scope/provider changes, and respects **Reduce motion**. Hidden or minimized windows stop animation work.
+
 Open Mini or Compact and select the **Widget settings** sliders. You can also open **Appearance & settings → Mini & Compact settings** from the dashboard.
 
 Select a **Screen corner** to place the widget inside your current monitor's work area. Drag the widget by its name to move it freely; double-click the name or select **Open dashboard** to expand it. **Transparent background** makes the panel translucent while keeping the text and controls opaque. Use **Hide to tray** to clear your desktop without stopping collection.

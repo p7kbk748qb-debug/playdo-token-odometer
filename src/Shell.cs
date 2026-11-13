@@ -10,6 +10,7 @@ namespace PlayDo.Odometer {
   public bool Topmost,ReduceMotion;
   public string Source,Corner="Free";
   public bool Transparent;
+  public bool AnimateCount;
   public SmallViewOptions Mini=new SmallViewOptions(),Compact=new SmallViewOptions {ShowBreakdown=true,ShowModel=true,ShowReset=true};
   public string Theme="Instrument",Font="Segoe UI",NumberFont="Consolas",Counter="Mechanical",View="Dashboard";
   public void Normalize(){
@@ -17,7 +18,7 @@ namespace PlayDo.Odometer {
    Theme=Appearance.Choice(Theme,Appearance.Themes);
    Font=Appearance.FontName(Font);NumberFont=NumberFont==null?"Consolas":Appearance.FontName(NumberFont);
    Counter=Appearance.Choice(Counter,Appearance.Counters);
-   if(Array.IndexOf(new[]{"Dashboard","Compact","Mini"},View)<0)View="Dashboard";
+   if(Array.IndexOf(Appearance.Views,View)<0)View="Dashboard";
   }
   public static Settings Load(string path){try{var prefs=File.Exists(path)?new JavaScriptSerializer().Deserialize<Settings>(File.ReadAllText(path)):new Settings();if(prefs==null)prefs=new Settings();prefs.Normalize();return prefs;}catch{return new Settings();}}
   public void Save(string path){Directory.CreateDirectory(Path.GetDirectoryName(path));File.WriteAllText(path,new JavaScriptSerializer().Serialize(this));}

@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.5.0 — 2026-11-12
+
+- Added Tiny: a 300 × 68 DIP number-only widget, draggable by its background or number, with small hide and dashboard controls.
+- Tiny supports themes, transparency, corner placement, saved layout restoration and the existing right-click actions. Open it from the dashboard, tray, window picker, Ctrl+Shift+T or --tiny.
+- Added optional **Animate token increases** in Appearance. A short native count-up runs only for increases in the same view, provider and scope. Reduce motion overrides it; hidden windows stop the timer.
+- Included the transparent taskbar gauge icon, with nine native sizes.
+
 ## 0.4.0 — 2026-11-08
 
 - Choose Codex, Claude Code, or both in the token counter, model breakdown and CSV export.

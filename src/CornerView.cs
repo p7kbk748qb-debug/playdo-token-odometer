@@ -58,10 +58,10 @@ namespace PlayDo.Odometer {
    var surface=Find<Border>("CompactView");
    if(small&&settings.Transparent){
     var color=((SolidColorBrush)Window.Resources["Surface"]).Color;
-    color.A=204;var brush=new SolidColorBrush(color);brush.Freeze();surface.Background=brush;
+    color.A=204;var brush=new SolidColorBrush(color);brush.Freeze();surface.Background=brush;Find<Border>("TinyView").Background=brush;
     SmallVisibility("SmallTexture",false);
    }else{
-    Resource(surface,Border.BackgroundProperty,"SurfaceMaterial");SmallVisibility("SmallTexture",true);
+    Resource(surface,Border.BackgroundProperty,"SurfaceMaterial");Resource(Find<Border>("TinyView"),Border.BackgroundProperty,"SurfaceMaterial");SmallVisibility("SmallTexture",true);
    }
    PlaceCorner();
   }

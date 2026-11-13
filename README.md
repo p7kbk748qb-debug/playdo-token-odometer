@@ -6,15 +6,15 @@
 
 **See your Codex and Claude Code token usage, discover which models you use most, and keep a small live counter on your Windows desktop.** PlayDo's Token Odometer is a free, open-source tray app with ten visual themes, compact layouts and CSV export. It reads local Codex and Claude Code usage records without an API key, account sign-in or background AI calls.
 
-**[Download for Windows x64](https://github.com/p7kbk748qb-debug/playdo-token-odometer/releases/latest/download/PlayDo-Token-Odometer-0.4.0-windows-x64.zip)** · [Release notes and SHA256 checksum](https://github.com/p7kbk748qb-debug/playdo-token-odometer/releases/latest) · [Project website](https://p7kbk748qb-debug.github.io/playdo-token-odometer/)
+**[Download for Windows x64](https://github.com/p7kbk748qb-debug/playdo-token-odometer/releases/latest/download/PlayDo-Token-Odometer-0.5.0-windows-x64.zip)** · [Release notes and SHA256 checksum](https://github.com/p7kbk748qb-debug/playdo-token-odometer/releases/latest) · [Project website](https://p7kbk748qb-debug.github.io/playdo-token-odometer/)
 
 ![Winter theme: native Windows Codex usage dashboard with token odometer and model breakdown](https://raw.githubusercontent.com/p7kbk748qb-debug/playdo-token-odometer/main/assets/screenshots/winter.png)
 
 *Screenshots use synthetic example data.*
 
-Choose **Codex**, **Claude Code**, or **Codex + Claude Code** from the source picker. Mini and Compact are borderless and can sit in a screen corner with a translucent background. [Configure small windows](https://github.com/p7kbk748qb-debug/playdo-token-odometer/blob/main/docs/SMALL-WINDOWS.md).
+Choose **Codex**, **Claude Code**, or **Codex + Claude Code** from the source picker. New **Tiny** fits an exact token count into a 300 × 68 DIP draggable panel. Count-up animation is optional in Appearance. [Small windows guide](https://github.com/p7kbk748qb-debug/playdo-token-odometer/blob/main/docs/SMALL-WINDOWS.md).
 
-![Borderless translucent Mini widget in combined mode, using synthetic data](https://raw.githubusercontent.com/p7kbk748qb-debug/playdo-token-odometer/main/assets/screenshots/corner-widget.png)
+![Tiny number-only desktop widget, using synthetic data](https://raw.githubusercontent.com/p7kbk748qb-debug/playdo-token-odometer/main/assets/screenshots/tiny.png)
 
 ![Compact layout with input/output totals, top model, allowance bars and reset times, using synthetic data](https://raw.githubusercontent.com/p7kbk748qb-debug/playdo-token-odometer/main/assets/screenshots/compact.png)
 
@@ -22,7 +22,7 @@ Choose **Codex**, **Claude Code**, or **Codex + Claude Code** from the source pi
 
 Requires **Windows 10 or 11 x64**, **.NET Framework 4.8**, and local Codex or Claude Code usage records. This is a portable app; no MSI installer or administrator rights are required.
 
-1. Download the [Windows ZIP](https://github.com/p7kbk748qb-debug/playdo-token-odometer/releases/latest/download/PlayDo-Token-Odometer-0.4.0-windows-x64.zip).
+1. Download the [Windows ZIP](https://github.com/p7kbk748qb-debug/playdo-token-odometer/releases/latest/download/PlayDo-Token-Odometer-0.5.0-windows-x64.zip).
 2. Extract the entire ZIP into a writable folder you want to keep. Keep `assets` beside the executable.
 3. Open **PlayDoTokenOdometer.exe**. The first launch indexes available local history; later launches resume incremental tracking.
 
@@ -72,6 +72,7 @@ These work while the odometer window has focus.
 | Ctrl+, | Open appearance and settings |
 | Ctrl+M | Switch Compact / Dashboard |
 | Ctrl+Shift+M | Open Mini |
+| Ctrl+Shift+T | Open Tiny |
 | Escape | Close appearance and return to the previous view |
 
 ## What the numbers mean
@@ -147,7 +148,7 @@ Useful command-line options:
 --compact                  Open compact view
 --mini                     Open the smallest view
 --appearance               Open the preset gallery and settings
---view <Dashboard|Compact|Mini>  Select and save a layout
+--view <Dashboard|Compact|Mini|Tiny>  Select and save a layout
 --shortcut                 Create the branded local launcher shortcut
 --install-shortcuts        Create/repair local and Start menu launchers
 --exit                     Ask the existing instance to exit

@@ -39,7 +39,7 @@ namespace PlayDo.Odometer {
       var menu=new Forms.ContextMenuStrip();menu.Items.Add("Open odometer",null,(s,e)=>dashboard.Show());
       var scopeMenu=new Forms.ToolStripMenuItem("Token period");foreach(string period in new[]{"Today","7 days","Recorded"}){string selected=period;scopeMenu.DropDownItems.Add(selected,null,(s,e)=>dashboard.SetScope(selected));}menu.Items.Add(scopeMenu);
       menu.Items.Add("Copy token total",null,(s,e)=>dashboard.CopyCurrentTotal());menu.Items.Add("Appearance & settings",null,(s,e)=>dashboard.OpenAppearance());
-      menu.Items.Add("Compact / full view",null,(s,e)=>{dashboard.Show();dashboard.ToggleCompact();});menu.Items.Add("Mini view",null,(s,e)=>{dashboard.SetView("Mini");dashboard.Show();});
+      menu.Items.Add("Compact / full view",null,(s,e)=>{dashboard.Show();dashboard.ToggleCompact();});menu.Items.Add("Tiny view",null,(s,e)=>{dashboard.SetView("Tiny");dashboard.Show();});menu.Items.Add("Mini view",null,(s,e)=>{dashboard.SetView("Mini");dashboard.Show();});
       menu.Items.Add("Pause / resume tracking",null,(s,e)=>dashboard.TogglePause());menu.Items.Add(new Forms.ToolStripSeparator());menu.Items.Add("Exit",null,(s,e)=>app.Shutdown());tray.ContextMenuStrip=menu;tray.DoubleClick+=(s,e)=>dashboard.Show();
       dashboard.ExitRequested+=()=>app.Shutdown();bool exiting=false;
       dashboard.Window.Closing+=(s,e)=>{if(!exiting){e.Cancel=true;dashboard.Window.Hide();}};
@@ -49,7 +49,7 @@ namespace PlayDo.Odometer {
       dashboard.RestoreView();
       string requestedView=Option(args,"--view");if(requestedView!=null)dashboard.SetView(requestedView);
       if(args.Contains("--compact"))dashboard.SetView("Compact");
-      if(args.Contains("--mini"))dashboard.SetView("Mini");
+      if(args.Contains("--mini"))dashboard.SetView("Mini");if(args.Contains("--tiny"))dashboard.SetView("Tiny");
       collector.Start();claudeCollector.Start();if(!args.Contains("--tray"))dashboard.Show();
       if(args.Contains("--appearance"))dashboard.OpenAppearance();
       string capture=Option(args,"--capture");string report=Option(args,"--report");

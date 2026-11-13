@@ -36,7 +36,7 @@
    <StackPanel Margin="28,24,28,18">
     <Grid Margin="0,0,0,24"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions><Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
      <StackPanel x:Name="HeaderBrand" Orientation="Horizontal"><Border Width="46" Height="46" CornerRadius="12" Background="{DynamicResource Accent}" Margin="0,0,14,0"><Viewbox Margin="10"><Path Fill="{DynamicResource OnAccent}" Data="M 1,2 L 9,2 C 17,2 17,14 9,14 L 6,14 L 6,21 L 1,21 Z M 6,6 L 6,10 L 9,10 C 12,10 12,6 9,6 Z"/></Viewbox></Border><StackPanel VerticalAlignment="Center"><TextBlock Text="PlayDo's" FontSize="13" Foreground="{DynamicResource Accent}" FontWeight="SemiBold"/><TextBlock Text="Token Odometer" FontSize="25" FontWeight="SemiBold" Margin="0,-2,0,0"/></StackPanel></StackPanel>
-     <StackPanel x:Name="HeaderActions" Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center"><Button x:Name="MiniButton" Content="Mini" Margin="0,0,8,0"/><Button x:Name="CompactButton" Content="Compact" Margin="0,0,8,0"/><Button x:Name="SettingsButton" Content="Appearance &amp; settings"/></StackPanel>
+     <StackPanel x:Name="HeaderActions" Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center"><Button x:Name="TinyButton" Content="Tiny" Margin="0,0,8,0"/><Button x:Name="MiniButton" Content="Mini" Margin="0,0,8,0"/><Button x:Name="CompactButton" Content="Compact" Margin="0,0,8,0"/><Button x:Name="SettingsButton" Content="Appearance &amp; settings"/></StackPanel>
     </Grid>
     <Border x:Name="SettingsPanel" Visibility="Collapsed" CornerRadius="{DynamicResource PanelRadius}" Background="{DynamicResource SurfaceAlt}" BorderBrush="{DynamicResource Stroke}" BorderThickness="1" Padding="20" Margin="0,0,0,20"><StackPanel>
      <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions><StackPanel Margin="0,0,12,0"><TextBlock Text="Appearance &amp; settings" FontSize="23" FontWeight="SemiBold"/><TextBlock Text="Choose a theme, adjust fonts or set up your small windows." Style="{StaticResource Label}" Margin="0,5,0,0" TextWrapping="Wrap"/><Button x:Name="SmallSettingsButton" Content="Mini &amp; Compact settings" HorizontalAlignment="Left" Margin="0,12,0,0"/></StackPanel><Button x:Name="CloseSettingsButton" Content="Done" Grid.Column="1" VerticalAlignment="Top" ToolTip="Close appearance · Escape"/></Grid>
@@ -50,7 +50,7 @@
       <StackPanel Margin="0,0,12,0"><TextBlock Text="Window" Style="{StaticResource Label}" Margin="0,0,0,6"/><ComboBox x:Name="ViewChoice" AutomationProperties.Name="Window size"/></StackPanel>
      </UniformGrid>
      <TextBlock x:Name="AppearanceNote" Foreground="{DynamicResource Muted}" FontSize="12" Margin="0,10,0,0" Text="Instrument · Segoe UI · Mechanical"/>
-     <WrapPanel Margin="0,8,0,0"><CheckBox x:Name="TopmostCheck" Content="Always on top" Margin="0,8,26,8"/><CheckBox x:Name="MotionCheck" Content="Reduce motion" Margin="0,8,26,8"/><CheckBox x:Name="StartupCheck" Content="Start with Windows"/></WrapPanel>
+     <WrapPanel Margin="0,8,0,0"><CheckBox x:Name="TopmostCheck" Content="Always on top" Margin="0,8,26,8"/><CheckBox x:Name="MotionCheck" Content="Reduce motion" Margin="0,8,26,8"/><CheckBox x:Name="AnimateCheck" Content="Animate token increases" Margin="0,8,26,8" ToolTip="Count up over 0.3 seconds. Reduce motion overrides this."/><CheckBox x:Name="StartupCheck" Content="Start with Windows"/></WrapPanel>
      <WrapPanel Margin="0,12,0,10"><Button x:Name="PauseButton" Content="Pause tracking" Margin="0,0,8,0"/><Button x:Name="RescanButton" Content="Check for new files" Margin="0,0,8,0"/><Button x:Name="FolderButton" Content="Open app folder" Margin="0,0,8,0"/><Button x:Name="ExitButton" Content="Exit app"/></WrapPanel>
      <TextBlock x:Name="SettingsNote" Foreground="{DynamicResource Muted}" FontSize="12" TextWrapping="Wrap" Text="Closing the window keeps tracking in the tray. Startup is optional. Mini and Compact have their own widget settings."/>
      <Border BorderThickness="0,1,0,0" BorderBrush="{DynamicResource Stroke}" Margin="0,10,0,0" Padding="0,12,0,0"><StackPanel><TextBlock Text="Keyboard shortcuts" FontWeight="SemiBold"/><TextBlock Text="Ctrl+1 / 2 / 3  Today / 7 days / Recorded    ·    Ctrl+Shift+C  Copy total&#10;Ctrl+E  Export CSV    ·    Ctrl+,  Style studio    ·    Ctrl+M  Compact    ·    Ctrl+Shift+M  Mini" TextWrapping="Wrap" Foreground="{DynamicResource Muted}" FontSize="12" Margin="0,5,0,10"/><TextBlock x:Name="AboutText" FontSize="12" Foreground="{DynamicResource Muted}" Text="PlayDo's Token Odometer · local, private and portable"/></StackPanel></Border>
@@ -107,5 +107,14 @@
     <TextBlock x:Name="CompactStatus" Text="Watching local Codex usage" FontSize="12" Foreground="{DynamicResource Muted}" TextTrimming="CharacterEllipsis"/>
    </StackPanel>
   </Grid></Border>
+  <Border x:Name="TinyView" Grid.Row="1" Visibility="Collapsed" Background="{DynamicResource SurfaceMaterial}" BorderBrush="{DynamicResource Stroke}" BorderThickness="1" CornerRadius="14" Padding="10,6" Cursor="SizeAll">
+   <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="38"/></Grid.ColumnDefinitions>
+    <Viewbox Stretch="Uniform" StretchDirection="DownOnly" VerticalAlignment="Center" Margin="0,0,5,0"><TextBlock x:Name="TinyNumber" Text="—" FontFamily="{DynamicResource NumberFont}" FontSize="48" FontWeight="Medium" Foreground="{DynamicResource Accent}" AutomationProperties.Name="Token count"/></Viewbox>
+    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Top">
+     <Button x:Name="TinyHide" AutomationProperties.Name="Hide Tiny to tray" ToolTip="Hide to tray" Width="18" Height="18" MinHeight="18" Padding="4"><Path Data="M 0,4 H 8" Stroke="{DynamicResource Muted}" StrokeThickness="1.2" Width="8" Height="8"/></Button>
+     <Button x:Name="TinyExpand" AutomationProperties.Name="Expand Tiny to dashboard" ToolTip="Open dashboard" Width="18" Height="18" MinHeight="18" Padding="4"><Path Data="M 0,3 V 0 H 3 M 5,0 H 8 V 3 M 8,5 V 8 H 5 M 3,8 H 0 V 5" Stroke="{DynamicResource Muted}" StrokeThickness="1.2" Width="8" Height="8"/></Button>
+    </StackPanel>
+   </Grid>
+  </Border>
  </Grid>
 </Window>

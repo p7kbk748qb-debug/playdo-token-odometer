@@ -16,7 +16,7 @@ namespace PlayDo.Odometer {
   public static readonly string[] Themes={"Instrument","Graphite","Arctic","Terminal","Winter","Hazy","Aurora","Blueprint","Sunset","Paper"};
   public static readonly string[] Fonts={"Segoe UI","Segoe UI Light","Bahnschrift","Consolas","Cascadia Mono","Lucida Console","Georgia","Trebuchet MS","Cambria"};
   public static readonly string[] Counters={"Mechanical","Clean","Ledger","Pixel","Frosted","Airy","Split","Outline","Ribbon","Serif"};
-  public static readonly string[] Views={"Dashboard","Compact","Mini"};
+  public static readonly string[] Views={"Dashboard","Compact","Mini","Tiny"};
   static readonly HashSet<string> InstalledFonts=new HashSet<string>(System.Windows.Media.Fonts.SystemFontFamilies.Select(x=>x.Source),StringComparer.OrdinalIgnoreCase);
   static readonly string[] Keys={"Canvas","Surface","SurfaceAlt","Control","Hover","Pressed","Stroke","Text","Muted","Accent","Signal","Selected","OnAccent","Digit","ChartBar"};
   public static readonly ThemePreset[] Presets={

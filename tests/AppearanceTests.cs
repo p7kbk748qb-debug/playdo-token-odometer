@@ -69,6 +69,39 @@ class AppearanceTests {
      prefs.Transparent=true;dashboard.SetView("Mini");Pump();dashboard.Capture(Path.Combine(root,"build","corner-both.png"));prefs.Transparent=false;
      picker.SelectedItem=SourceTotals.Codex;dashboard.SetView("Dashboard");Pump();Assert(dashboard.CurrentSnapshot().Today.Total==13175,"Codex-only token total wrong");
     });
+    Check("Tiny preserves exact counts, drag area and layout preference",delegate{
+     dashboard.SetView("Tiny");Pump();
+     Assert(dashboard.Window.Width==300&&dashboard.Window.Height==68,"Tiny is not tiny");
+     var plate=(Border)dashboard.Window.FindName("TinyView");var number=(TextBlock)dashboard.Window.FindName("TinyNumber");
+     Assert(plate.Visibility==Visibility.Visible&&((Border)dashboard.Window.FindName("CompactView")).Visibility==Visibility.Collapsed,"Tiny did not replace the widget");
+     Assert(Dashboard.TinyDragTarget(number)&&Dashboard.TinyDragTarget(plate),"Number or background cannot drag");
+     Assert(!Dashboard.TinyDragTarget((Button)dashboard.Window.FindName("TinyExpand")),"Expand button intercepted by drag");
+     Assert(plate.ContextMenu!=null,"Tiny actions menu missing");
+     var draw=typeof(Dashboard).GetMethod("RenderDigits",BindingFlags.Instance|BindingFlags.NonPublic);
+     foreach(string theme in Appearance.Themes){dashboard.SelectPreset(theme);Pump();draw.Invoke(dashboard,new object[]{396659182L,true});dashboard.Capture(Path.Combine(root,"build","tiny-"+theme.ToLowerInvariant()+".png"));}
+     draw.Invoke(dashboard,new object[]{long.MaxValue,true});Assert(number.Text==long.MaxValue.ToString("N0"),"Large count rounded or truncated");dashboard.Capture(Path.Combine(root,"build","tiny-long.png"));
+     var saved=Settings.Load(prefsPath);Assert(saved.View=="Tiny","Tiny not saved");
+     Press(dashboard,"TinyHide");Assert(!dashboard.Window.IsVisible,"Tiny hide failed");dashboard.Show();
+     Press(dashboard,"TinyExpand");Assert(dashboard.Window.Width>=760,"Tiny expand failed");dashboard.SetView("Tiny");dashboard.OpenAppearance();Press(dashboard,"CloseSettingsButton");Assert(dashboard.Window.Height==68,"Appearance did not return to Tiny");
+     dashboard.SetView("Dashboard");
+    });
+    Check("count-up motion is optional exact and stops with Reduce motion",delegate{
+     Assert(NumberMotion.At(100,200,0)==100&&NumberMotion.At(100,200,1)==200,"Animation endpoints wrong");
+     long previous=long.MaxValue-1000;for(int i=0;i<=10;i++){long next=NumberMotion.At(long.MaxValue-1000,long.MaxValue,i/10.0);Assert(next>=previous&&next<=long.MaxValue,"Large count overflow or reverse");previous=next;}
+     dashboard.SetView("Tiny");prefs.AnimateCount=true;prefs.ReduceMotion=false;
+     var draw=typeof(Dashboard).GetMethod("RenderDigits",BindingFlags.Instance|BindingFlags.NonPublic);
+     draw.Invoke(dashboard,new object[]{100L,true});draw.Invoke(dashboard,new object[]{500L,true});
+     var timer=(DispatcherTimer)typeof(Dashboard).GetField("numberTimer",BindingFlags.Instance|BindingFlags.NonPublic).GetValue(dashboard);
+     Assert(timer!=null&&timer.IsEnabled,"Animation did not start");
+     draw.Invoke(dashboard,new object[]{400L,true});Assert(!timer.IsEnabled&&Read(dashboard,"TinyNumber")=="400","Corrected lower target kept animating");
+     draw.Invoke(dashboard,new object[]{100L,true});draw.Invoke(dashboard,new object[]{500L,true});
+     Pump();long middle=long.Parse(Read(dashboard,"TinyNumber"),System.Globalization.NumberStyles.Number);
+     Assert(middle>100&&middle<=500,"No intermediate count");
+     draw.Invoke(dashboard,new object[]{700L,true});Pump();Pump();Pump();Assert(Read(dashboard,"TinyNumber")=="700"&&!timer.IsEnabled,"Retarget did not settle exactly");
+     draw.Invoke(dashboard,new object[]{900L,true});dashboard.Window.Hide();Assert(!timer.IsEnabled&&Read(dashboard,"TinyNumber")=="900","Hidden timer kept running");
+     dashboard.Show();prefs.ReduceMotion=true;draw.Invoke(dashboard,new object[]{1000L,true});Assert(!timer.IsEnabled&&Read(dashboard,"TinyNumber")==1000L.ToString("N0"),"Reduce motion not honored");
+     prefs.AnimateCount=false;dashboard.SetView("Dashboard");
+    });
     Check("corner mode is borderless, translucent and reversible",delegate{
      prefs.Transparent=true;prefs.Corner="Bottom right";dashboard.SetView("Mini");Pump();
      Assert(dashboard.Window.WindowStyle==WindowStyle.None&&dashboard.Window.AllowsTransparency,"Native chrome still visible");
