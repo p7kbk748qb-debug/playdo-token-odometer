@@ -1,6 +1,6 @@
 # Contributing
 
-PlayDo's Token Odometer is a native Windows app written in C# and WPF. Changes should keep local usage private, avoid extra background work and remain usable in Dashboard, Compact and Mini layouts.
+PlayDo's Token Odometer is a C# desktop application for Windows and macOS, using Avalonia and a shared local accounting core. Changes should keep usage private, avoid extra background work and support Dashboard, Compact, Mini and Tiny layouts. The previous Windows WPF application remains in `src/` for compatibility and regression checks.
 
 ## Before you start
 
@@ -8,7 +8,18 @@ Check [existing issues](https://github.com/p7kbk748qb-debug/playdo-token-odomete
 
 ## Development setup
 
-Use Windows 10 or 11 x64, .NET Framework 4.8 and Windows PowerShell. The scripts use the Windows Framework C# compiler; no SDK, NuGet packages or font downloads are required.
+Use .NET SDK 10 and PowerShell 7. Build native packages on their target operating system. macOS releases target version 15 or later.
+
+```powershell
+dotnet run --project portable/Tests/Odometer.Tests.csproj
+dotnet run --project portable/ProviderTests/ProviderTests.csproj
+dotnet run --project portable/Desktop/PlayDo.Odometer.Desktop.csproj
+./portable/package.ps1 -Runtime win-x64
+```
+
+On macOS, package with `osx-arm64` or `osx-x64`. The portable workflow verifies extracted native packages, local accounting, provider formats, font previews and window layouts using synthetic records. See [the provider audit](docs/PORTABILITY-AUDIT.md) before adding a source.
+
+The legacy Windows build uses .NET Framework 4.8 and Windows PowerShell:
 
 ```powershell
 .\test.ps1
@@ -17,13 +28,13 @@ Use Windows 10 or 11 x64, .NET Framework 4.8 and Windows PowerShell. The scripts
 .\test-qol.ps1
 ```
 
-The appearance checks render synthetic usage. For a complete portable build, close an app running from `dist` and run `./package.ps1`, then `./tools/verify-package.ps1` to extract and test the ZIP with synthetic records. Use `./package.ps1 -SkipBuild` only after building and verifying the same source yourself.
+The legacy appearance checks render synthetic usage. Legacy packaging uses `./package.ps1` and `./tools/verify-package.ps1`; these scripts build the previous WPF application, not the new portable desktop release.
 
 ## Changes and tests
 
-- Keep C# compatible with the compiler used by `build.ps1`; avoid adding package dependencies without discussing the need.
+- Shared `src/` files must remain compatible with the legacy compiler used by `build.ps1`. Keep portable-only code in `portable/`. Avoid dependencies without a clear need.
 - Add focused synthetic fixtures for accounting, replay protection or persistence changes. Never use a real Codex session as a fixture.
-- Check text contrast, keyboard access, reduced motion and all three window layouts after appearance changes. Prefer installed Windows fonts with a fallback; do not redistribute fonts.
+- Check contrast, keyboard access, reduced motion and all four layouts after appearance changes. Preview font names in their own typeface, use safe fallbacks, and preserve third-party font licenses.
 - Preserve aggregate totals across upgrades. Model attribution is approximate, and cached input and reasoning counts are subsets.
 - Keep background work event driven and bounded. Hidden windows should not redraw continuously.
 - Project tracking has been removed; do not reintroduce working-directory collection as part of model attribution.
@@ -32,7 +43,7 @@ Include the reason for a change, user-visible behavior and verification in a pul
 
 ## Privacy when reporting problems
 
-Never attach your `.codex` folder, authentication files, usage databases, settings, real diagnostic reports or live screenshots. Share a minimal synthetic example and app/Windows versions instead. See [SECURITY.md](SECURITY.md) for sensitive reports.
+Never attach provider data folders, authentication files, usage databases, settings, real diagnostic reports or live screenshots. Share a minimal synthetic example and app/OS versions instead. See [SECURITY.md](SECURITY.md) for sensitive reports.
 
 ## License
 
