@@ -46,7 +46,11 @@ if($Runtime -eq 'win-x64'){
  $macos=Join-Path $bundle 'Contents/MacOS'
  $resources=Join-Path $bundle 'Contents/Resources'
  New-Item -ItemType Directory -Path $macos,$resources -Force | Out-Null
- Copy-Item -Path (Join-Path $publish '*') -Destination $macos -Recurse
+ # Documentation and notices are resources, not nested executable bundles.
+ foreach($item in Get-ChildItem -LiteralPath $publish){
+  $destination=if($item.Name -eq 'Licenses' -or $item.Extension -eq '.md' -or $item.Name -eq 'LICENSE'){$resources}else{$macos}
+  Copy-Item -LiteralPath $item.FullName -Destination $destination -Recurse
+ }
  $plist=@"
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
