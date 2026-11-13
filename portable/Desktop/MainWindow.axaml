@@ -1,0 +1,66 @@
+<Window xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" x:Class="PlayDo.Desktop.MainWindow"
+ Title="PlayDo’s Token Odometer" Width="1080" Height="780" MinWidth="760" MinHeight="540" Background="{DynamicResource Canvas}" WindowStartupLocation="CenterScreen"
+ TransparencyLevelHint="Transparent" Icon="/Assets/app.ico">
+ <Grid x:Name="Root">
+  <Grid x:Name="Dashboard" ColumnDefinitions="184,*">
+   <Border Background="{DynamicResource Canvas}" Padding="16,24"><DockPanel>
+    <StackPanel DockPanel.Dock="Top" Spacing="2" Margin="0,0,0,28"><Image Source="/Assets/app-icon.png" Width="32" Height="32" HorizontalAlignment="Left" Margin="10,0,0,12"/><TextBlock Text="Token" FontSize="20" FontWeight="SemiBold" Margin="10,0"/><TextBlock Text="Odometer" FontSize="20" FontWeight="SemiBold" Margin="10,0"/><TextBlock Text="by PlayDo" Classes="muted" FontSize="11" Margin="10,6"/></StackPanel>
+    <StackPanel DockPanel.Dock="Bottom" Spacing="8"><TextBlock Text="LOCAL USAGE" Classes="muted" FontSize="10" Margin="12,0"/><TextBlock Text="No account keys.&#10;No usage uploads." Classes="muted" FontSize="11" LineHeight="18" Margin="12,0"/></StackPanel>
+    <StackPanel><Button x:Name="OverviewNav" Classes="rail" Content="Overview"/><Button x:Name="ProvidersNav" Classes="rail" Content="Providers"/><Button x:Name="AppearanceNav" Classes="rail" Content="Appearance"/><Button x:Name="SettingsNav" Classes="rail" Content="Settings"/></StackPanel>
+   </DockPanel></Border>
+   <ScrollViewer Grid.Column="1" Padding="32,28" HorizontalScrollBarVisibility="Disabled">
+    <StackPanel Spacing="22">
+     <Grid ColumnDefinitions="*,Auto"><StackPanel><TextBlock x:Name="PageTitle" Text="Usage overview" Classes="heading"/><TextBlock x:Name="PageSubtitle" Text="Your selected tools, in one counter." Classes="muted" Margin="0,6,0,0"/></StackPanel><ComboBox x:Name="LayoutChoice" Grid.Column="1" Width="132" VerticalAlignment="Center" AutomationProperties.Name="Window layout"/></Grid>
+     <StackPanel x:Name="OverviewPage" Spacing="20">
+      <Grid ColumnDefinitions="*,Auto"><TextBlock x:Name="Status" Classes="muted" VerticalAlignment="Center" TextWrapping="Wrap" Margin="0,0,10,0"/><ComboBox x:Name="ScopeChoice" Grid.Column="1" Width="138" AutomationProperties.Name="Token period"/></Grid>
+      <Border Classes="panel"><StackPanel Spacing="16">
+       <TextBlock x:Name="ScopeLabel" Text="TODAY’S TOKENS" FontSize="11" Foreground="{DynamicResource Muted}" LetterSpacing="1"/>
+       <Viewbox Height="78" Stretch="Uniform" StretchDirection="DownOnly" HorizontalAlignment="Left"><TextBlock x:Name="Total" Text="—" FontSize="68" FontWeight="Medium" Foreground="{DynamicResource Accent}"/></Viewbox>
+       <TextBlock x:Name="SourceSummary" Classes="muted" TextWrapping="Wrap"/>
+       <Border Height="1" Background="{DynamicResource Stroke}"/>
+       <Grid ColumnDefinitions="*,*,*"><StackPanel><TextBlock Text="Input" Classes="muted"/><TextBlock x:Name="InputValue" FontSize="23" Margin="0,5,0,0"/></StackPanel><StackPanel Grid.Column="1"><TextBlock Text="Output" Classes="muted"/><TextBlock x:Name="OutputValue" FontSize="23" Margin="0,5,0,0"/></StackPanel><StackPanel Grid.Column="2"><TextBlock Text="Cached input" Classes="muted"/><TextBlock x:Name="CacheValue" FontSize="23" Margin="0,5,0,0"/><TextBlock Text="Included in input" Classes="muted" FontSize="10" Margin="0,4,0,0"/></StackPanel></Grid>
+       <StackPanel Orientation="Horizontal" Spacing="8"><Button x:Name="CopyButton" Content="Copy total"/><Button x:Name="ExportButton" Content="Export CSV"/></StackPanel>
+      </StackPanel></Border>
+      <Border x:Name="AllowancePanel" Classes="panel"><StackPanel Spacing="10"><TextBlock Text="Codex account allowance" FontSize="15" FontWeight="Medium"/><TextBlock x:Name="AllowanceText" Classes="muted" TextWrapping="Wrap"/><ProgressBar x:Name="Allowance" Height="5" Maximum="100" Foreground="{DynamicResource Signal}"/><TextBlock Text="A local account snapshot. Separate from token totals." Classes="muted" FontSize="11"/></StackPanel></Border>
+      <Grid ColumnDefinitions="*,22,*">
+       <StackPanel Spacing="12"><TextBlock Text="Models in use" FontSize="17" FontWeight="SemiBold"/><StackPanel x:Name="ModelRows" Spacing="12"/></StackPanel>
+       <StackPanel Grid.Column="2" Spacing="12"><TextBlock Text="Last seven days" FontSize="17" FontWeight="SemiBold"/><StackPanel x:Name="DayRows" Spacing="9"/></StackPanel>
+      </Grid>
+      <TextBlock Text="Counts follow complete local reports. Missing logs and other devices can limit coverage. Subscription credits are not inferred." Classes="muted" FontSize="11" TextWrapping="Wrap" Margin="0,6,0,0"/>
+     </StackPanel>
+     <StackPanel x:Name="ProvidersPage" IsVisible="False" Spacing="18">
+      <TextBlock Text="Select the tools you want to count. Existing local reports are detected automatically; you can also choose a custom folder." Classes="muted" TextWrapping="Wrap"/>
+      <StackPanel x:Name="ProviderRows" Spacing="12"/>
+      <Border Classes="panel"><StackPanel Spacing="8"><TextBlock Text="Other AI apps" FontWeight="SemiBold"/><TextBlock Text="Web chats and apps that don’t expose local token reports cannot be counted reliably. This release does not read browser sessions, collect account keys, or estimate usage from message length." Classes="muted" TextWrapping="Wrap"/></StackPanel></Border>
+     </StackPanel>
+     <StackPanel x:Name="AppearancePage" IsVisible="False" Spacing="20">
+      <StackPanel Spacing="6"><TextBlock Text="Choose a starting point" FontSize="17" FontWeight="SemiBold"/><TextBlock Text="Themes apply a full palette and font pair. Fine-tune either font below." Classes="muted" TextWrapping="Wrap"/></StackPanel>
+      <UniformGrid x:Name="ThemeGallery" Columns="3"/>
+      <Grid ColumnDefinitions="*,16,*"><StackPanel Spacing="8"><TextBlock Text="Interface font" FontWeight="Medium"/><ComboBox x:Name="InterfaceFont" HorizontalAlignment="Stretch" AutomationProperties.Name="Interface font"/></StackPanel><StackPanel Grid.Column="2" Spacing="8"><TextBlock Text="Number font" FontWeight="Medium"/><ComboBox x:Name="CounterFont" HorizontalAlignment="Stretch" AutomationProperties.Name="Number font"/></StackPanel></Grid>
+      <Border Classes="panel"><StackPanel Spacing="12"><TextBlock Text="LIVE PREVIEW" Classes="muted" FontSize="10"/><Viewbox Height="54" Stretch="Uniform" StretchDirection="DownOnly" HorizontalAlignment="Left"><TextBlock x:Name="NumberPreview" Text="396,659,182" FontSize="48" Foreground="{DynamicResource Accent}"/></Viewbox><TextBlock x:Name="FontNote" Classes="muted" TextWrapping="Wrap"/></StackPanel></Border>
+      <CheckBox x:Name="AnimateCheck" Content="Animate token increases"/><CheckBox x:Name="MotionCheck" Content="Reduce motion"/>
+     </StackPanel>
+     <StackPanel x:Name="SettingsPage" IsVisible="False" Spacing="18">
+      <TextBlock Text="Desktop widget" FontSize="17" FontWeight="SemiBold"/>
+      <CheckBox x:Name="TopmostCheck" Content="Keep the widget above other windows"/>
+      <CheckBox x:Name="TransparentCheck" Content="Use a transparent widget background"/>
+      <CheckBox x:Name="QuotaCheck" Content="Show Codex allowance in Mini and Compact"/>
+      <StackPanel Spacing="8"><TextBlock Text="Screen corner"/><ComboBox x:Name="CornerChoice" Width="200" HorizontalAlignment="Left" AutomationProperties.Name="Screen corner"/></StackPanel>
+      <Border Classes="panel"><StackPanel Spacing="8"><TextBlock Text="Local data" FontSize="16" FontWeight="SemiBold"/><TextBlock x:Name="DataPath" Classes="muted" TextWrapping="Wrap"/><TextBlock Text="The data folder holds aggregate counts, settings, and hashed replay metadata. It does not store your conversation bodies." Classes="muted" TextWrapping="Wrap"/><Button x:Name="DataButton" Content="Open data folder" HorizontalAlignment="Left"/></StackPanel></Border>
+      <TextBlock Text="Close the window to keep tracking in the menu bar or system tray. Use Exit to stop the collector. Drag widgets by the number or background; right-click to change views." Classes="muted" TextWrapping="Wrap"/>
+      <Button x:Name="ExitButton" Content="Exit application" HorizontalAlignment="Left"/>
+     </StackPanel>
+     <TextBlock x:Name="Feedback" Classes="muted" TextWrapping="Wrap"/>
+    </StackPanel>
+   </ScrollViewer>
+  </Grid>
+  <Border x:Name="Widget" IsVisible="False" CornerRadius="14" Background="{DynamicResource Surface}" BorderBrush="{DynamicResource Stroke}" BorderThickness="1" Padding="14,10">
+   <Grid RowDefinitions="Auto,*,Auto">
+    <Grid x:Name="WidgetHeader" ColumnDefinitions="*,Auto"><TextBlock x:Name="WidgetScope" Classes="muted" VerticalAlignment="Center" FontSize="11"/><StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="4"><Button x:Name="WidgetSettings" Content="Settings" Padding="8,3" MinHeight="28"/><Button x:Name="WidgetExpand" Content="Expand" Padding="8,3" MinHeight="28"/><Button x:Name="WidgetHide" Content="Hide" Padding="8,3" MinHeight="28"/></StackPanel></Grid>
+    <Viewbox Grid.Row="1" Stretch="Uniform" StretchDirection="DownOnly" HorizontalAlignment="Left" Margin="0,5,0,0"><TextBlock x:Name="WidgetNumber" Text="—" FontSize="56" Foreground="{DynamicResource Accent}"/></Viewbox>
+    <StackPanel x:Name="WidgetDetails" Grid.Row="2" Spacing="6"><TextBlock x:Name="WidgetBreakdown" Classes="muted" FontSize="12"/><TextBlock x:Name="WidgetAllowance" Classes="muted" FontSize="11" TextWrapping="Wrap"/></StackPanel>
+    <StackPanel x:Name="TinyActions" IsVisible="False" Grid.RowSpan="3" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top"><Button x:Name="TinyHide" Content="–" AutomationProperties.Name="Hide Tiny" ToolTip.Tip="Hide to tray" MinHeight="18" Height="18" Width="18" Padding="0"/><Button x:Name="TinyExpand" Content="↗" AutomationProperties.Name="Expand Tiny" ToolTip.Tip="Open dashboard" MinHeight="18" Height="18" Width="18" Padding="0"/></StackPanel>
+   </Grid>
+  </Border>
+ </Grid>
+</Window>

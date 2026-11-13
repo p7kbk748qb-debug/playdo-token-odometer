@@ -1,0 +1,67 @@
+name: Portable desktop
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  desktop:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: windows-latest
+            runtime: win-x64
+          - runner: macos-15
+            runtime: osx-arm64
+          - runner: macos-15-intel
+            runtime: osx-x64
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - name: Shared accounting and cursor tests
+        shell: pwsh
+        run: |
+          dotnet run --project portable/Tests/Odometer.Tests.csproj -c Release
+          if ($LASTEXITCODE) { throw 'Accounting tests failed' }
+          dotnet run --project portable/ProviderTests/ProviderTests.csproj -c Release
+          if ($LASTEXITCODE) { throw 'Provider tests failed' }
+      - name: Build self-contained application
+        shell: pwsh
+        run: ./portable/package.ps1 -Runtime ${{ matrix.runtime }}
+      - name: Native desktop and extracted package checks
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          $runtime='${{ matrix.runtime }}'
+          if ($runtime -eq 'win-x64') {
+            $package=(Resolve-Path "release/PlayDo-Token-Odometer-0.6.0-$runtime.zip").Path
+            $extracted=Join-Path $PWD 'build/extracted'
+            Expand-Archive -LiteralPath $package -DestinationPath $extracted
+            $exe=Join-Path $extracted 'PlayDoTokenOdometer.exe'
+          } else {
+            $package=(Resolve-Path "release/PlayDo-Token-Odometer-0.6.0-$runtime.dmg").Path
+            $mount=Join-Path $PWD 'build/dmg-mount'
+            New-Item -ItemType Directory -Path $mount -Force | Out-Null
+            hdiutil attach $package -nobrowse -readonly -mountpoint $mount
+            if ($LASTEXITCODE) { throw 'DMG mount failed' }
+            $exe=Join-Path $mount "PlayDo's Token Odometer.app/Contents/MacOS/PlayDoTokenOdometer"
+            codesign --verify --deep --strict (Join-Path $mount "PlayDo's Token Odometer.app")
+            if ($LASTEXITCODE) { throw 'App signature verification failed' }
+          }
+          & $exe --core-smoke --data (Join-Path $PWD 'build/core-smoke')
+          if ($LASTEXITCODE) { throw 'Published runtime smoke failed' }
+          ./portable/verify-desktop.ps1 -Executable $exe
+          if ($runtime -ne 'win-x64') { hdiutil detach $mount }
+      - uses: actions/upload-artifact@v4
+        with:
+          name: desktop-${{ matrix.runtime }}
+          path: |
+            release/*-${{ matrix.runtime }}.*
+            build/desktop-check-*/appearance*.png
+            build/desktop-check-*/portable-tiny.png
+          if-no-files-found: error

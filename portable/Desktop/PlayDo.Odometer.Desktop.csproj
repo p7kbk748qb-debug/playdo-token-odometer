@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk">
+ <PropertyGroup>
+  <OutputType>WinExe</OutputType><TargetFramework>net8.0</TargetFramework><Nullable>enable</Nullable><ImplicitUsings>enable</ImplicitUsings>
+  <AssemblyName>PlayDoTokenOdometer</AssemblyName><Version>0.6.0</Version><ApplicationIcon>../../assets/app.ico</ApplicationIcon>
+  <AvaloniaUseCompiledBindingsByDefault>false</AvaloniaUseCompiledBindingsByDefault><UseAppHost>true</UseAppHost>
+ </PropertyGroup>
+ <ItemGroup><PackageReference Include="Avalonia.Desktop" Version="11.3.23"/><PackageReference Include="Avalonia.Themes.Fluent" Version="11.3.23"/><PackageReference Include="Avalonia.Fonts.Inter" Version="11.3.23"/></ItemGroup>
+ <ItemGroup><ProjectReference Include="../Core/Odometer.Core.csproj"/><AvaloniaResource Include="Assets/**"/><AvaloniaResource Include="../../assets/app-icon.png" Link="Assets/app-icon.png"/><AvaloniaResource Include="../../assets/app.ico" Link="Assets/app.ico"/></ItemGroup>
+</Project>
