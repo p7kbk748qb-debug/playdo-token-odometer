@@ -4,7 +4,7 @@
 2. Open the disk image and drag **PlayDo’s Token Odometer.app** to Applications.
 3. Open the app and select the tools you use on the Providers page. No account key is required.
 
-The application bundles its runtime. You do not need to install .NET. macOS 13 or later is the distribution target.
+The application bundles its runtime. You do not need to install .NET. macOS 15 or later is the distribution target.
 
 This community build is ad-hoc signed, not Apple notarized. macOS may prevent the first launch. Review the release/source, then use the per-app **Open Anyway** option in System Settings → Privacy & Security if you decide to run it. Do not disable Gatekeeper globally.
 

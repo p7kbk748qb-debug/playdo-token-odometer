@@ -18,6 +18,10 @@ class Program {
   NativeLibrary.SetDllImportResolver(typeof(Program).Assembly,(name,_,_)=>name=="winsqlite3.dll"?NativeLibrary.Load(OperatingSystem.IsWindows()?name:OperatingSystem.IsMacOS()?"/usr/lib/libsqlite3.dylib":"libsqlite3.so.0"):IntPtr.Zero);
   string temp=Path.Combine(Path.GetTempPath(),"odometer-providers-"+Guid.NewGuid().ToString("N"));Directory.CreateDirectory(temp);
   try{
+   Check("Directory aliases cannot start two desktop cache writers",()=>{
+    string folder=Path.Combine(temp,"instance");using var first=new InstanceGate(folder);using var alias=new InstanceGate(folder+Path.DirectorySeparatorChar);Assert(first.IsPrimary&&!alias.IsPrimary,"directory alias bypassed writer lock");
+    if(OperatingSystem.IsWindows()){using var casing=new InstanceGate(folder.ToUpperInvariant());Assert(!casing.IsPrimary,"case alias bypassed writer lock");}
+   });
    Check("Gemini total includes thoughts and replay adds only growth",()=>{var l=new UsageLedger();l.AcceptGemini("s",Gemini());l.AcceptGemini("copy",Gemini());Assert(l.TotalFor(DateTime.MinValue).Total==109,"wrong total");l.AcceptGemini("s",Gemini(10));Assert(l.TotalFor(DateTime.MinValue).Total==111,"replay growth wrong");Assert(l.TotalFor(DateTime.MinValue).Cached==70,"cache not subset");});
    Check("Gemini ignores user records and missing identities",()=>{var l=new UsageLedger();l.AcceptGemini("s","{\"type\":\"user\",\"tokens\":{\"input\":20}}");l.AcceptGemini("s","{\"type\":\"gemini\",\"timestamp\":\"bad\"}");Assert(l.TotalFor(DateTime.MinValue).Total==0,"invalid usage counted");});
    Check("OpenCode includes reasoning cache read and cache write once",()=>{var l=new UsageLedger();l.AcceptOpenCode("msg_fixture","s",OpenCode(),DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());l.AcceptOpenCode("msg_fixture","copy",OpenCode(),DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());var t=l.TotalFor(DateTime.MinValue);Assert(t.Input==99&&t.Output==10&&t.Total==109&&t.Cached==70,"wrong OpenCode total");});

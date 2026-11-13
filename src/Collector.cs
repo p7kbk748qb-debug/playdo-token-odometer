@@ -85,6 +85,6 @@ namespace PlayDo.Odometer {
    }catch(Exception){error="Collector stopped unexpectedly. Reopen the app to retry.";if(state!=null)Publish();}
    finally{foreach(var watcher in watchers)watcher.Dispose();if(state!=null)state.Dispose();}
   }
-  public void Dispose(){stopping=true;wake.Set();if(worker!=null)worker.Join(3000);}
+  public void Dispose(){stopping=true;wake.Set();if(worker!=null&&!worker.Join(10000))throw new IOException("Collector is still finishing a read. Try again after it stops.");}
  }
 }

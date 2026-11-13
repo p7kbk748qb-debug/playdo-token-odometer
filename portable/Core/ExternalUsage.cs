@@ -45,12 +45,13 @@ namespace PlayDo.Odometer {
   readonly string provider,root,path;readonly AutoResetEvent wake=new(false);readonly object gate=new();
   Thread worker;volatile bool stopping,enabled;volatile Snapshot snapshot=new();SavedState state;
   readonly Dictionary<string,long> modified=new();long watermark;int files;long bytes;DateTime lastDiscovery;string databaseStamp="";
-  string[] discovered=Array.Empty<string>();string note="";
+  string[] discovered=Array.Empty<string>();string note="";FileSystemWatcher watcher;
+  readonly HashSet<string> pending=new(StringComparer.OrdinalIgnoreCase);
   public string Root=>root;
   public ExternalCollector(string provider,string root,string data){this.provider=provider;this.root=root;path=Path.Combine(data,provider.ToLowerInvariant()+"-usage-v1.db");}
   public Snapshot GetSnapshot()=>snapshot;
   public void Start(){worker=new Thread(Run){IsBackground=true,Priority=ThreadPriority.BelowNormal,Name=provider+" usage"};worker.Start();}
-  public void Enable(bool value){enabled=value;wake.Set();}
+  public void Enable(bool value){enabled=value;if(value)lastDiscovery=DateTime.MinValue;wake.Set();}
   public void Refresh(){lastDiscovery=DateTime.MinValue;wake.Set();}
   void Run(){
    try{
@@ -63,14 +64,21 @@ namespace PlayDo.Odometer {
     }
     if(state!=null)Store.Save(path,state);
    }catch{Publish("Cannot open local cache. Check folder permissions.");}
-   finally{state?.Dispose();}
+   finally{watcher?.Dispose();state?.Dispose();}
   }
   void ScanGemini(){
    string folder=Path.Combine(root,"tmp");
    if(!Directory.Exists(folder)){files=0;note="No Gemini CLI session folder found";return;}
-   if((DateTime.UtcNow-lastDiscovery).TotalSeconds>=30){discovered=Directory.GetFiles(folder,"session-*.json*",SearchOption.AllDirectories).Where(p=>p.EndsWith(".json")||p.EndsWith(".jsonl")).ToArray();lastDiscovery=DateTime.UtcNow;}
+   if(watcher==null){
+    watcher=new FileSystemWatcher(folder,"session-*.json*"){IncludeSubdirectories=true,NotifyFilter=NotifyFilters.FileName|NotifyFilters.LastWrite|NotifyFilters.Size,InternalBufferSize=16384};
+    FileSystemEventHandler queue=(_,e)=>{if(!enabled)return;lock(gate)pending.Add(e.FullPath);wake.Set();};
+    watcher.Changed+=queue;watcher.Created+=queue;watcher.Renamed+=(_,e)=>{lock(gate)pending.Add(e.FullPath);wake.Set();};watcher.Error+=(_,_)=>{lastDiscovery=DateTime.MinValue;wake.Set();};watcher.EnableRaisingEvents=true;
+   }
+   bool reconcile=(DateTime.UtcNow-lastDiscovery).TotalSeconds>=30;
+   if(reconcile){discovered=Directory.GetFiles(folder,"session-*.json*",SearchOption.AllDirectories).Where(p=>p.EndsWith(".json")||p.EndsWith(".jsonl")).ToArray();lastDiscovery=DateTime.UtcNow;}
+   string[] candidates;lock(gate){candidates=reconcile?discovered:pending.ToArray();pending.Clear();}
    files=discovered.Length;note=files==0?"No Gemini CLI session reports found":"Watching local Gemini CLI reports";
-   foreach(string file in discovered){
+   foreach(string file in candidates){
     if(stopping||!enabled)break;
     var info=new FileInfo(file);if(!info.Exists)continue;
     long stamp=info.LastWriteTimeUtc.Ticks;
@@ -85,6 +93,7 @@ namespace PlayDo.Odometer {
      }
      bytes+=info.Length;
     }else note="A large session report was skipped";
+    if(stopping||!enabled)return;
     modified[file]=stamp;
    }
   }
@@ -99,6 +108,7 @@ namespace PlayDo.Odometer {
    string filter=table=="session_message"?" AND type='assistant'":" AND json_extract(data,'$.role')='assistant'";
    var rows=NativeSqlite.ReadRows(db,"SELECT id,session_id,data,time_created,time_updated FROM "+table+" WHERE time_updated>="+Math.Max(0,watermark).ToString(CultureInfo.InvariantCulture)+filter+" ORDER BY time_updated");
    foreach(var row in rows){if(stopping||!enabled)break;if(long.TryParse(row[3],out long created)){state.Ledger.AcceptOpenCode(row[0],row[1],row[2],created);if(long.TryParse(row[4],out long updated))watermark=Math.Max(watermark,updated);}bytes+=row[2]?.Length??0;}
+   if(stopping||!enabled)return;
    databaseStamp=stamp;note="Watching local OpenCode reports";
   }
   void Publish(string status){
@@ -108,6 +118,6 @@ namespace PlayDo.Odometer {
    s.Models=ledger.Models.Values.Select(m=>new BreakdownView{Id=m.Id,Label=m.Label,Today=UsageLedger.TotalForDays(m.Days,DateTime.Today),Week=UsageLedger.TotalForDays(m.Days,DateTime.Today.AddDays(-6)),Recorded=UsageLedger.TotalForDays(m.Days,DateTime.MinValue)}).ToList();
    if(ledger.Sessions.Count>0)s.LastEvent=ledger.Sessions.Values.Max(x=>x.LastAt);snapshot=s;
   }
-  public void Dispose(){stopping=true;wake.Set();worker?.Join(5000);}
+  public void Dispose(){stopping=true;wake.Set();if(worker!=null&&!worker.Join(10000))throw new IOException("Collector is still finishing a read. Try again after it stops.");}
  }
 }

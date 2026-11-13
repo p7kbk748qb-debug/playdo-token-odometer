@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.6.0 — 2026-11-12
+
+- Added self-contained native desktop packages for Windows x64, Apple Silicon Macs and Intel Macs.
+- Rebuilt the dashboard with separate Overview, Providers, Appearance and Settings pages.
+- Added Gemini CLI session and OpenCode SQLite usage sources, independently selectable with Codex and Claude Code.
+- Added a broader installed-font picker with names rendered in their own typeface, live number previews and ten coordinated presets.
+- Preserved the four layouts, optional translucency, count-up animation, reduced motion, provider/model CSV and Mini/Compact widget choices.
+- Added consistent, non-destructive legacy Windows cache import and local single-writer protection.
+- macOS bundles are ad-hoc signed and not notarized. Windows packages are unsigned. The runtime is included.
+
 ## 0.5.0 — 2026-11-12
 
 - Added Tiny: a 300 × 68 DIP number-only widget, draggable by its background or number, with small hide and dashboard controls.

@@ -1,174 +1,88 @@
-# PlayDo's Token Odometer — Codex and Claude Code token tracker for Windows
+# PlayDo’s Token Odometer
 
-[![Windows 10 / 11 x64](https://img.shields.io/badge/Windows-10%20%2F%2011%20x64-0078D4)](https://github.com/p7kbk748qb-debug/playdo-token-odometer#download-and-install)
-[![Latest release](https://img.shields.io/github/v/release/p7kbk748qb-debug/playdo-token-odometer)](https://github.com/p7kbk748qb-debug/playdo-token-odometer/releases/latest)
-[![MIT license](https://img.shields.io/badge/license-MIT-blue)](https://github.com/p7kbk748qb-debug/playdo-token-odometer/blob/main/LICENSE)
+### An extremely customizable AI token odometer for Windows and macOS
 
-**See your Codex and Claude Code token usage, discover which models you use most, and keep a small live counter on your Windows desktop.** PlayDo's Token Odometer is a free, open-source tray app with ten visual themes, compact layouts and CSV export. It reads local Codex and Claude Code usage records without an API key, account sign-in or background AI calls.
+Track the tools you use. Choose a look that fits your desktop. Keep the full dashboard open or tuck a number-only Tiny widget into a corner.
 
-**[Download for Windows x64](https://github.com/p7kbk748qb-debug/playdo-token-odometer/releases/latest/download/PlayDo-Token-Odometer-0.5.0-windows-x64.zip)** · [Release notes and SHA256 checksum](https://github.com/p7kbk748qb-debug/playdo-token-odometer/releases/latest) · [Project website](https://p7kbk748qb-debug.github.io/playdo-token-odometer/)
+**Free and open source. Local records. No account keys or background AI calls.**
 
-![Winter theme: native Windows Codex usage dashboard with token odometer and model breakdown](https://raw.githubusercontent.com/p7kbk748qb-debug/playdo-token-odometer/main/assets/screenshots/winter.png)
-
-*Screenshots use synthetic example data.*
-
-Choose **Codex**, **Claude Code**, or **Codex + Claude Code** from the source picker. New **Tiny** fits an exact token count into a 300 × 68 DIP draggable panel. Count-up animation is optional in Appearance. [Small windows guide](https://github.com/p7kbk748qb-debug/playdo-token-odometer/blob/main/docs/SMALL-WINDOWS.md).
-
-![Tiny number-only desktop widget, using synthetic data](https://raw.githubusercontent.com/p7kbk748qb-debug/playdo-token-odometer/main/assets/screenshots/tiny.png)
-
-![Compact layout with input/output totals, top model, allowance bars and reset times, using synthetic data](https://raw.githubusercontent.com/p7kbk748qb-debug/playdo-token-odometer/main/assets/screenshots/compact.png)
-
-## Download and install
-
-Requires **Windows 10 or 11 x64**, **.NET Framework 4.8**, and local Codex or Claude Code usage records. This is a portable app; no MSI installer or administrator rights are required.
-
-1. Download the [Windows ZIP](https://github.com/p7kbk748qb-debug/playdo-token-odometer/releases/latest/download/PlayDo-Token-Odometer-0.5.0-windows-x64.zip).
-2. Extract the entire ZIP into a writable folder you want to keep. Keep `assets` beside the executable.
-3. Open **PlayDoTokenOdometer.exe**. The first launch indexes available local history; later launches resume incremental tracking.
-
-The executable is **unsigned**. Windows may show an unknown-publisher or SmartScreen notice; review the source and release provenance before deciding whether to run it. See the [installation guide](https://github.com/p7kbk748qb-debug/playdo-token-odometer/blob/main/docs/INSTALL.md) for checksums, upgrades and removal. In a source checkout, build first and open `dist/PlayDoTokenOdometer.exe`.
-
-- **Pin:** open the app, right-click its taskbar icon, choose **Pin to taskbar**. Run the executable with `--install-shortcuts` to create or repair the Start menu and local launchers, including their matching Windows app identity. From Start, right-click **PlayDo's Token Odometer** and choose **More → Pin to taskbar**. Windows owns the final pin action.
-- **Background:** close the window; the tray icon keeps tracking. Double-click the tray icon or open the taskbar shortcut to restore it.
-- **Layouts:** Mini is 360px wide; Compact is 440px wide. Both fit their enabled widgets. Select **Settings** to independently choose 5-hour and weekly usage bars, reset times, input/output totals, top model and activity status. Changes save immediately. [Small window guide](https://github.com/p7kbk748qb-debug/playdo-token-odometer/blob/main/docs/SMALL-WINDOWS.md).
-- **Appearance:** open **Appearance & settings** for the preset gallery. Each preset supplies coordinated interface and number fonts, counter styling, panel geometry and static materials. Fine-tune fonts or counters, then use Restore preset styling to return to that preset's defaults. Changes preview immediately and persist across launches. Missing fonts fall back safely.
-- **Copy and export:** copy the current period's total or export its aggregate model breakdown to CSV. Exports contain scope, model and token counts; no session IDs, working folders or conversation text.
-- **Startup:** enable **Start with Windows** in Settings if wanted. It is off by default.
-- **Exit:** choose Exit in the tray menu or Exit app in Settings.
-- **Pause:** pauses reads; Resume catches up on records written during the pause.
-
-The release is portable. Keep its executable and `assets` together in a writable folder. An extracted release stores aggregate usage in `data/live` beside the executable. The development checkout stores it in the project's `data/live` folder. To uninstall, first disable Start with Windows, exit the app, then remove its folder and unpin its shortcut.
-
-## Ten complete styles
-
-Open **Appearance & settings** or press **Ctrl+,** to use Style Studio. Each preset changes interface and number fonts, counter styling, panel shapes and static materials.
-
-![Style Studio showing ten coordinated themes for the token usage monitor](https://raw.githubusercontent.com/p7kbk748qb-debug/playdo-token-odometer/main/assets/screenshots/style-studio.png)
-
-| Preset | Character |
+| Download v0.6.0 | Package |
 | --- | --- |
-| Instrument | Ink blue, amber and cyan; mechanical counter |
-| Graphite | Neutral charcoal, silver accents; clean numbers |
-| Arctic | Light steel and navy; crisp outlined panels |
-| Terminal | Dark console, green phosphor and monospace text |
-| Winter | Midnight frost, silver typography and crystalline detail |
-| Hazy | Smoky lavender, warm light and softer serif typography |
-| Aurora | Deep teal and plum with angular ribbons |
-| Blueprint | Technical navy, cyan grid and drafting typography |
-| Sunset | Warm charcoal, apricot accents and rounded plates |
-| Paper | Ivory ledger, graphite ink and serif typography |
+| [Windows x64](https://github.com/p7kbk748qb-debug/playdo-token-odometer/releases/latest/download/PlayDo-Token-Odometer-0.6.0-win-x64.zip) | Self-contained ZIP |
+| [Mac — Apple Silicon](https://github.com/p7kbk748qb-debug/playdo-token-odometer/releases/latest/download/PlayDo-Token-Odometer-0.6.0-osx-arm64.dmg) | Drag-to-Applications DMG |
+| [Mac — Intel](https://github.com/p7kbk748qb-debug/playdo-token-odometer/releases/latest/download/PlayDo-Token-Odometer-0.6.0-osx-x64.dmg) | Drag-to-Applications DMG |
 
-Presets use fonts already installed in Windows. Static brushes and patterns require no continuous animation or downloaded assets.
+[Release notes and SHA256 checksums](https://github.com/p7kbk748qb-debug/playdo-token-odometer/releases/latest) · [Project website](https://p7kbk748qb-debug.github.io/playdo-token-odometer/) · [MIT license](LICENSE)
 
-## Keyboard shortcuts
+![The charcoal instrument-panel dashboard showing synthetic usage](https://raw.githubusercontent.com/p7kbk748qb-debug/playdo-token-odometer/main/assets/screenshots/desktop-overview.png)
 
-These work while the odometer window has focus.
+Screenshots use synthetic reports. They do not contain the owner’s usage history.
 
-| Shortcut | Action |
-| --- | --- |
-| Ctrl+1 / Ctrl+2 / Ctrl+3 | Today / 7 days / Recorded |
-| Ctrl+Shift+C | Copy current token total |
-| Ctrl+E | Export current scope as CSV |
-| Ctrl+, | Open appearance and settings |
-| Ctrl+M | Switch Compact / Dashboard |
-| Ctrl+Shift+M | Open Mini |
-| Ctrl+Shift+T | Open Tiny |
-| Escape | Close appearance and return to the previous view |
+## Make it yours
 
-## What the numbers mean
+- **Ten coordinated presets:** Graphite, Instrument, Arctic, Terminal, Winter, Hazy, Aurora, Blueprint, Sunset and Paper.
+- **Font variety:** choose installed serif, sans, monospace and display families. Every name previews its own typeface, including the selected font. Interface and number fonts are independent.
+- **Four layouts:** Dashboard, Compact, Mini and a 300 × 68 DIP Tiny counter.
+- **Desktop controls:** optional transparency, always-on-top, corner placement, and drag-to-move widgets.
+- **Independent Mini/Compact contents:** allowance bars, reset times, input/output, top model and activity status.
+- **Motion you control:** optional count-up animation with a Reduce motion override. Hidden windows stop UI refresh and animation.
+- **Your providers, your total:** enable the programs you want; disable the rest. Today, 7 days, Recorded, model breakdown and CSV use that selection.
 
-**Tokens** are observations from local Codex `token_count` records and Claude Code assistant usage records. Input + output makes the total. Cached input is already included in input; reasoning tokens are already included in output. These can be large numbers because context is processed repeatedly during work.
+![Ten preset palettes with their own typography, and separate live font selectors](https://raw.githubusercontent.com/p7kbk748qb-debug/playdo-token-odometer/main/assets/screenshots/desktop-appearance.png)
 
-**Claude Code** reads complete assistant usage records under the local `projects` folder, including nested subagent files. Input includes uncached input, cache reads and cache writes. The cached input column shows the read subset. Repeated snapshots of the same response count once. Claude usage is stored separately from Codex history. For Claude plan limits, use [Claude Code’s `/usage` command](https://code.claude.com/docs/en/costs#using-the-usage-command).
+## Supported programs
 
-**Today** uses the PC's local calendar date. **7 days** includes today plus the previous six dates. **Recorded** covers usage imported from available uncompressed local files. Initial indexing is shown explicitly and runs in a background worker. Later updates usually appear within about two seconds of a complete usage record, subject to Windows scheduling. Codex reports usage in batches; this is not a per-token stream.
+| Program | Source | Coverage |
+| --- | --- | --- |
+| Codex | Local session JSONL | Input, cached input, output and reported account allowance |
+| Claude Code | Local assistant usage JSONL | Input, cache reads/writes and output, including subagents |
+| Gemini CLI | Local session JSON / JSONL | Reported token totals including thought tokens |
+| OpenCode | Read-only local SQLite | Assistant input, output, reasoning and cache tokens |
 
-The first record contributes its reported last-call counters, not an unexplained cumulative balance. Following records contribute cumulative increases. Repeated snapshots and exact fork replays are suppressed; a counter reset uses last-call usage. Incomplete historical logs, undisclosed fork baselines and missing records can limit coverage. This is a personal activity monitor, not an account billing statement.
+Detected sources appear on **Providers**. Select any combination, or choose a custom source folder. Disabled providers stop collection. Missing or unsupported reports are labeled; they do not stand in for verified zero usage.
 
-**Models in use** ranks approximate tokens and each model's share of the chosen Today, 7 days or Recorded scope. Attribution follows the model named in each local turn's metadata, including switches within a chat. **Unknown** retains usage whose model was not recorded. Show all reveals additional models beyond the top eight.
+These are observed local formats, not account integrations. Web-only ChatGPT or Claude conversations and tools without local token reports are not supported. Token counts do not convert directly into subscription credits. [Provider and portability audit](https://github.com/p7kbk748qb-debug/playdo-token-odometer/blob/main/docs/PORTABILITY-AUDIT.md).
 
-The model breakdown reconciles to the global scope total. The app does not track projects or working folders.
+## Install
 
-The first launch of this upgrade indexes local metadata once into `data/live/usage-v3.db`. Previous `usage-v2.db` files remain intact and are read only to preserve older observations. If original records are no longer readable, their tokens remain Unknown. Returning old logs can fill in attribution without adding their usage twice; new usage continues to increase normally. Later launches resume incremental reads.
+**Windows:** extract the whole ZIP into a writable folder and open `PlayDoTokenOdometer.exe`. Keep the files together. The runtime is included; no separate .NET installation is needed. [Windows installation and history import](https://github.com/p7kbk748qb-debug/playdo-token-odometer/blob/main/portable/WINDOWS-INSTALL.md).
 
-**Account allowance** is the latest quota snapshot Codex wrote locally. The app displays remaining percentage, window duration, reset and reported age. Snapshots older than 15 minutes are labeled older. After a reset passes, the app waits for a new report instead of inventing a renewed allowance. Cloud or other-device usage appears only when a local Codex quota snapshot reflects it. Token totals do not directly convert into subscription percentage or dollar charges.
+**macOS 15+:** choose the package for your processor, mount the DMG, and drag the app into Applications. The runtime is included. [Mac installation guide](https://github.com/p7kbk748qb-debug/playdo-token-odometer/blob/main/portable/MACOS-INSTALL.md).
 
-Compressed `.jsonl.zst` archives are excluded and counted in the footer. Remote sessions without local records are not counted. A zero is a measured scope total; absent quota is shown as unknown.
+Windows builds are unsigned. macOS bundles are ad-hoc signed and **not Apple notarized**. Review the release/source before deciding to allow a first launch. Use the per-app OS approval flow; do not disable system protections globally.
 
-## Low overhead and privacy
+Version 0.6 introduces the native UI shared across Windows and macOS. Existing Windows users should keep the previous app folder and import history **before the first launch** of the new version. Import copies consistent SQLite snapshots and keeps the original caches. Existing target data is never replaced. [Legacy Windows v0.5.0](https://github.com/p7kbk748qb-debug/playdo-token-odometer/releases/tag/v0.5.0) remains available.
 
-- Native C# / WPF; no browser engine, Node server, cloud database or AI calls.
-- Windows file notifications coalesce updates. A 60-second reconciliation checks metadata to recover missed notifications.
-- Complete-line byte cursors avoid re-reading unchanged logs. Large unrelated lines have a 256 KiB accumulation cap.
-- Windows' built-in SQLite stores hashed replay identities on disk with a 2 MiB page-cache target. Aggregate checkpoint and replay identities commit in one transaction.
-- No continuous frame/render loop. Hidden/minimized windows stop UI refresh timers and avoid collector-driven redraws.
-- Reads the user's `CODEX_HOME` or defaults to `%USERPROFILE%\.codex`. No authentication keys are read and no network requests are made.
-- Local cache contains dates, aggregate counts, session IDs, model names, source-file positions, quota snapshots and replay hashes. Working-directory/project metadata is ignored. Prompt text and conversation bodies are not persisted. Model metadata stays on this PC.
-- Actual CPU and memory vary with Windows, DPI, history size and active workloads. Theme materials are static and UI refresh stops while hidden.
+## What the counter means
 
-One 15-second tray sample during active Codex work measured approximately **84 MB working set and 0.36% of total machine CPU** on a 12-logical-processor PC. This is an observation, not a performance guarantee.
+Total is input plus output. Cached input is already included in input; reasoning is included in output. Claude Code and OpenCode separate cache reads/writes, which the adapters normalize into input. Gemini’s reported total includes thought tokens. Repeat responses and replayed local records are deduplicated.
 
-## FAQ
+Today follows the computer’s local calendar; 7 days includes today. Recorded covers imported, readable local reports. Missing logs, other devices, compressed archives and format changes can limit coverage. The app labels Codex account allowance as a separate, dated snapshot.
 
-### Does it work with a ChatGPT Codex subscription?
+## Local data and controls
 
-It can read usage records written locally by Codex, without an API key. It does not access your account billing or infer your subscription cost. It is an independent community project, not an official OpenAI product.
+- Windows data: `%LOCALAPPDATA%/PlayDo/TokenOdometer/Desktop`
+- Mac data: `~/Library/Application Support/PlayDo Token Odometer`
+- Close the window to keep tracking in the tray/menu bar. Use Exit to stop it.
+- Use Settings to pause collection or configure widgets.
+- CSV exports aggregate provider/model counts, without session IDs, working folders or conversation text.
+- The application does not upload usage or read account credentials.
 
-### Why does my total differ from another usage dashboard?
+CLI overrides: `--data`, `--codex-home`, `--claude-home`, `--gemini-home`, `--opencode-home`, and `--import-legacy`. Provider folders can also be changed in the UI.
 
-This app counts available local records using the replay and reset rules described above. Remote sessions without local records, missing historical files and compressed `.jsonl.zst` archives are not counted. Recorded usage is not complete account-wide history. The displayed allowance is a separate Codex snapshot, not a conversion from tokens.
+## Build and contribute
 
-### Does it upload my conversations?
-
-No. The application makes no network requests and does not persist conversation bodies. CSV export contains only scope, model and aggregate token counts. Keep local cache files and diagnostic reports private.
-
-## Build and test
-
-Requires Windows 10/11 x64, installed .NET Framework 4.8, and Windows PowerShell. No SDK, NuGet or package downloads.
+The shared C# ledger and Windows legacy source are in `src/`. The portable UI, provider adapters and packaging are in `portable/`. Build with .NET SDK 10:
 
 ```powershell
-.\test.ps1
-.\build.ps1
-.\tools\verify-appearance.ps1
-.\test-qol.ps1
-.\package.ps1 -SkipBuild
-.\tools\verify-package.ps1
+dotnet run --project portable/Tests/Odometer.Tests.csproj
+dotnet run --project portable/ProviderTests/ProviderTests.csproj
+dotnet run --project portable/Desktop/PlayDo.Odometer.Desktop.csproj
+./portable/package.ps1 -Runtime win-x64
 ```
 
-Tests exercise cumulative accounting, cached subsets, replay/reset protection, day scoping, 64-bit counters, split/oversized/replaced lines, live appends, pause/catch-up, transactional cache restart and corrupt-cache recovery.
+On macOS, use `osx-arm64` or `osx-x64`. CI tests native packages on all three targets, including DMG mounting and app launch. Test fixtures and screenshots are synthetic.
 
-`tools/verify-appearance.ps1` exercises the preset gallery, preference persistence, typography, contrast, small layouts, shortcuts, model scopes, absence of project controls and preserved-history display using synthetic records; its screenshots stay in ignored `build/`. `test-qol.ps1` checks scope selection, 64-bit totals, CSV escaping and spreadsheet formula protection. `package.ps1` can also build and run all checks itself before creating the portable ZIP and SHA256 file in `release/`.
+If it helps your workflow, a GitHub star helps others find it. [Report a bug](https://github.com/p7kbk748qb-debug/playdo-token-odometer/issues) or contribute a documented provider adapter with synthetic tests. Please keep real logs, databases, account keys and private file paths out of public reports.
 
-The build generates `assets/app-icon.png`, multi-size `assets/app.ico`, and `assets/cover.png` from authored vector geometry in `tools/BrandAssets.cs`. No external branding asset is required. The executable is a personal unsigned build.
-
-Useful command-line options:
-
-```text
---tray                     Start hidden in the tray
---compact                  Open compact view
---mini                     Open the smallest view
---appearance               Open the preset gallery and settings
---view <Dashboard|Compact|Mini|Tiny>  Select and save a layout
---shortcut                 Create the branded local launcher shortcut
---install-shortcuts        Create/repair local and Start menu launchers
---exit                     Ask the existing instance to exit
---codex-home <folder>       Use another local Codex home
---claude-home <folder>      Use another Claude Code configuration folder
---data <folder>             Override aggregate/settings directory
---isolated                 Separate test instance identity
---capture <png>             Save the app's rendered UI after indexing
---report <json>             Save a local diagnostic snapshot (contains usage)
---exit-after-capture        Exit after capture/report
-```
-
-Keep `data/`, diagnostics and live screenshots out of GitHub; the ignore rules already exclude them. The repository ships source, docs and branding, not personal usage.
-
-Read the [contribution guide](https://github.com/p7kbk748qb-debug/playdo-token-odometer/blob/main/CONTRIBUTING.md) to help with the code, and the [security policy](https://github.com/p7kbk748qb-debug/playdo-token-odometer/security/policy) before reporting sensitive issues. Portable packages include the installation guide, license and changelog.
-
-Protocol reference: [official OpenAI Codex app-server documentation](https://learn.chatgpt.com/docs/app-server). The app uses observed local record schemas, which may require updates if Codex changes them.
-
-## Help the project grow
-
-If this Codex usage monitor helps you, a **GitHub star** makes it easier for others to find. Useful [bug reports](https://github.com/p7kbk748qb-debug/playdo-token-odometer/issues/new?template=bug_report.yml), [feature ideas](https://github.com/p7kbk748qb-debug/playdo-token-odometer/issues/new?template=feature_request.yml), synthetic screenshots and contributions are welcome.
-
-Released under the [MIT license](https://github.com/p7kbk748qb-debug/playdo-token-odometer/blob/main/LICENSE). “Codex” and OpenAI marks belong to their respective owners.
+An independent community project. Product names belong to their respective owners.

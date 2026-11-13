@@ -13,6 +13,7 @@ public partial class App:Application {
    tracker=new TrackerService(Program.Arguments);
    string? legacy=TrackerService.Option(Program.Arguments,"--import-legacy");if(legacy!=null)tracker.ImportLegacy(legacy);
    var window=new MainWindow(tracker);desktop.MainWindow=window;desktop.ShutdownMode=ShutdownMode.OnExplicitShutdown;
+   InstanceGate.OpenRequested=()=>Avalonia.Threading.Dispatcher.UIThread.Post(window.Reveal);
    var menu=new NativeMenu();
    var open=new NativeMenuItem("Open odometer");open.Click+=(_,_)=>window.Reveal();menu.Add(open);
    foreach(string layout in new[]{"Dashboard","Compact","Mini","Tiny"}){var item=new NativeMenuItem(layout);item.Click+=(_,_)=>{window.SetLayout(layout);window.Reveal();};menu.Add(item);}

@@ -11,6 +11,32 @@ if($LASTEXITCODE){throw 'Portable publish failed'}
 $public=@('LICENSE','README.md')
 foreach($name in $public){Copy-Item -LiteralPath (Join-Path $root $name) -Destination $publish}
 Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'MACOS-INSTALL.md'),(Join-Path $PSScriptRoot 'WINDOWS-INSTALL.md') -Destination $publish
+$licenses=Join-Path $publish 'Licenses'
+Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'Licenses') -Destination $licenses -Recurse
+$assets=Get-Content (Join-Path $PSScriptRoot 'Desktop/obj/project.assets.json') -Raw | ConvertFrom-Json
+$runtimeConfig=Get-Content (Join-Path $publish 'PlayDoTokenOdometer.runtimeconfig.json') -Raw | ConvertFrom-Json
+$runtimeVersion=($runtimeConfig.runtimeOptions.includedFrameworks | Where-Object name -eq 'Microsoft.NETCore.App' | Select-Object -First 1).version
+foreach($packageFolder in $assets.packageFolders.PSObject.Properties.Name){
+ $runtimeFolder=Join-Path $packageFolder ("microsoft.netcore.app.runtime.$Runtime/"+$runtimeVersion)
+ if(Test-Path $runtimeFolder){
+  $target=Join-Path $licenses ("dotnet-runtime-"+$runtimeVersion)
+  New-Item -ItemType Directory -Path $target -Force | Out-Null
+  Get-ChildItem $runtimeFolder -File | Where-Object Name -Match 'license|notice' | Copy-Item -Destination $target
+ }
+}
+foreach($library in $assets.libraries.PSObject.Properties){
+ if($library.Value.type -ne 'package'){continue}
+ foreach($packageFolder in $assets.packageFolders.PSObject.Properties.Name){
+  $folder=Join-Path $packageFolder $library.Value.path
+  if(-not (Test-Path -LiteralPath $folder)){continue}
+  $notices=@(Get-ChildItem -LiteralPath $folder -File | Where-Object Name -Match 'license|licence|notice|copying')
+  if($notices.Count){
+   $target=Join-Path $licenses ($library.Name.Replace('/','-'))
+   New-Item -ItemType Directory -Path $target -Force | Out-Null
+   foreach($notice in $notices){Copy-Item -LiteralPath $notice.FullName -Destination $target}
+  }
+ }
+}
 if($Runtime -eq 'win-x64'){
  $archive=Join-Path $release "PlayDo-Token-Odometer-$version-$Runtime.zip"
  Compress-Archive -Path (Join-Path $publish '*') -DestinationPath $archive -Force
@@ -33,7 +59,7 @@ if($Runtime -eq 'win-x64'){
 <key>CFBundleVersion</key><string>$version</string>
 <key>CFBundleShortVersionString</key><string>$version</string>
 <key>NSHighResolutionCapable</key><true/>
-<key>LSMinimumSystemVersion</key><string>13.0</string>
+<key>LSMinimumSystemVersion</key><string>15.0</string>
 <key>CFBundleIconFile</key><string>odometer.icns</string>
 </dict></plist>
 "@

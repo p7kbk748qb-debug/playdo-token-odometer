@@ -2,7 +2,17 @@ using System.Text.Json;
 using PlayDo.Odometer;
 
 namespace PlayDo.Desktop;
+public sealed class WidgetOptions {
+ public bool ShowPrimary {get;set;}=true;
+ public bool ShowWeekly {get;set;}=true;
+ public bool ShowReset {get;set;}
+ public bool ShowBreakdown {get;set;}
+ public bool ShowModel {get;set;}
+ public bool ShowStatus {get;set;}=true;
+}
 public sealed class Preferences {
+ public WidgetOptions Mini {get;set;}=new();
+ public WidgetOptions Compact {get;set;}=new(){ShowReset=true,ShowBreakdown=true,ShowModel=true};
  public string Theme {get;set;}="Graphite";
  public string Font {get;set;}="Inter";
  public string NumberFont {get;set;}="Inter";
@@ -13,6 +23,7 @@ public sealed class Preferences {
  public bool Transparent {get;set;}
  public bool Animate {get;set;}
  public bool ReduceMotion {get;set;}
+ public bool Paused {get;set;}
  public bool ShowAllowance {get;set;}=true;
  public Dictionary<string,bool> Enabled {get;set;}=new();
  public Dictionary<string,string> Roots {get;set;}=new();
@@ -31,14 +42,18 @@ public sealed class TrackerService:IDisposable {
  public List<Provider> Providers {get;}=new();
  public string Note {get;private set;}="";
  readonly string settingsPath;bool started;
+ public static string DataPath(string[] args){
+  string home=Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+  return Option(args,"--data")??(OperatingSystem.IsMacOS()?Path.Combine(home,"Library","Application Support","PlayDo Token Odometer"):Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),"PlayDo","TokenOdometer","Desktop"));
+ }
  public TrackerService(string[] args){
   string home=Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-  DataFolder=Option(args,"--data")??Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),"PlayDo","TokenOdometer","Desktop");
-  if(OperatingSystem.IsMacOS()&&Option(args,"--data")==null)DataFolder=Path.Combine(home,"Library","Application Support","PlayDo Token Odometer");
+  DataFolder=DataPath(args);
   Directory.CreateDirectory(DataFolder);settingsPath=Path.Combine(DataFolder,"preferences.json");
   bool existing=File.Exists(settingsPath);
   try{Settings=existing?JsonSerializer.Deserialize<Preferences>(File.ReadAllText(settingsPath))??new():new();}catch{Settings=new();Note="Preferences could not be read; defaults are active. The original file was kept.";}
   Settings.Enabled??=new();Settings.Roots??=new();
+  Settings.Mini??=new();Settings.Compact??=new(){ShowReset=true,ShowBreakdown=true,ShowModel=true};
   var defaults=new Dictionary<string,string>{
    ["Codex"]=Option(args,"--codex-home")??Environment.GetEnvironmentVariable("CODEX_HOME")??Path.Combine(home,".codex"),
    ["Claude Code"]=Option(args,"--claude-home")??Environment.GetEnvironmentVariable("CLAUDE_CONFIG_DIR")??Path.Combine(home,".claude"),
@@ -55,14 +70,15 @@ public sealed class TrackerService:IDisposable {
    Providers.Add(p);
   }
  }
- public void Start(){if(started)return;started=true;foreach(var p in Providers){bool on=Settings.Enabled.GetValueOrDefault(p.Name);p.Builtin?.Pause(!on);p.External?.Enable(on);p.Builtin?.Start();p.External?.Start();}}
- public void Select(string provider,bool enabled){Settings.Enabled[provider]=enabled;var p=Providers.First(x=>x.Name==provider);p.Builtin?.Pause(!enabled);p.External?.Enable(enabled);Save();}
+ public void Start(){if(started)return;started=true;foreach(var p in Providers){bool on=Settings.Enabled.GetValueOrDefault(p.Name)&&!Settings.Paused;p.Builtin?.Pause(!on);p.External?.Enable(on);p.Builtin?.Start();p.External?.Start();}}
+ public void Select(string provider,bool enabled){Settings.Enabled[provider]=enabled;var p=Providers.First(x=>x.Name==provider);p.Builtin?.Pause(!enabled||Settings.Paused);p.External?.Enable(enabled&&!Settings.Paused);Save();}
+ public void Pause(bool paused){Settings.Paused=paused;foreach(var p in Providers){bool on=!paused&&Settings.Enabled.GetValueOrDefault(p.Name);p.Builtin?.Pause(!on);p.External?.Enable(on);}Save();}
  public void Refresh(){foreach(var p in Providers){p.Builtin?.Refresh();p.External?.Refresh();}}
  public void SetRoot(string provider,string root){
-  Settings.Roots[provider]=root;Save();var p=Providers.First(x=>x.Name==provider);
-  p.Builtin?.Dispose();p.External?.Dispose();p.Root=root;
-  if(provider=="Codex"||provider=="Claude Code"){p.Builtin=new Collector(root,DataFolder,provider=="Claude Code");p.Builtin.Pause(!Settings.Enabled.GetValueOrDefault(provider));if(started)p.Builtin.Start();}
-  else{p.External=new ExternalCollector(provider,root,DataFolder);p.External.Enable(Settings.Enabled.GetValueOrDefault(provider));if(started)p.External.Start();}
+  var p=Providers.First(x=>x.Name==provider);
+  p.Builtin?.Dispose();p.External?.Dispose();Settings.Roots[provider]=root;Save();p.Root=root;
+  if(provider=="Codex"||provider=="Claude Code"){p.Builtin=new Collector(root,DataFolder,provider=="Claude Code");p.Builtin.Pause(!Settings.Enabled.GetValueOrDefault(provider)||Settings.Paused);if(started)p.Builtin.Start();}
+  else{p.External=new ExternalCollector(provider,root,DataFolder);p.External.Enable(Settings.Enabled.GetValueOrDefault(provider)&&!Settings.Paused);if(started)p.External.Start();}
   Note="Folder saved. New reports will be added to the existing provider history.";
  }
  public void Save(){
@@ -79,26 +95,28 @@ public sealed class TrackerService:IDisposable {
    foreach(var d in data.Days){if(!s.Days.TryGetValue(d.Key,out var total)){total=new();s.Days[d.Key]=total;}total.Add(d.Value);}
    foreach(var m in data.Models)s.Models.Add(new BreakdownView{Id=p.Name+":"+m.Id,Label=p.Name+" · "+m.Label,Today=m.Today,Week=m.Week,Recorded=m.Recorded});
   }
-  s.Status=count==0?"No providers selected":s.Indexing?"Importing local history":s.Recorded.Total==0?"Waiting for local usage reports":"Tracking "+count+" selected "+(count==1?"provider":"providers");
+  s.Paused=Settings.Paused;s.Status=Settings.Paused?"Paused · resume to catch up":count==0?"No providers selected":s.Indexing?"Importing local history":s.Recorded.Total==0?"Waiting for local usage reports":"Tracking "+count+" selected "+(count==1?"provider":"providers");
   return s;
  }
  public void ImportLegacy(string folder){
   if(started)throw new InvalidOperationException("Import history before collection starts");
+  int imported=0,skipped=0;
   foreach(string name in new[]{"usage-v3.db","claude-usage-v1.db","usage-v2.db"}){
    string source=Path.Combine(folder,name),target=Path.Combine(DataFolder,name);
-   if(File.Exists(source)&&!File.Exists(target))NativeSqlite.Backup(source,target);
+   if(File.Exists(source)){if(File.Exists(target)){skipped++;continue;}NativeSqlite.Backup(source,target);imported++;}
   }
   string old=Path.Combine(folder,"settings.json");
   if(File.Exists(old)&&!File.Exists(settingsPath)){
    using var doc=JsonDocument.Parse(File.ReadAllText(old));var json=doc.RootElement;
-   foreach(string field in new[]{"Theme","Font","NumberFont"})if(json.TryGetProperty(field,out var value)&&value.ValueKind==JsonValueKind.String)typeof(Preferences).GetProperty(field)!.SetValue(Settings,value.GetString());
+   foreach(string field in new[]{"Theme","Font","NumberFont","Corner"})if(json.TryGetProperty(field,out var value)&&value.ValueKind==JsonValueKind.String)typeof(Preferences).GetProperty(field)!.SetValue(Settings,value.GetString());
+   foreach(string field in new[]{"Mini","Compact"})if(json.TryGetProperty(field,out var value)&&value.ValueKind==JsonValueKind.Object)typeof(Preferences).GetProperty(field)!.SetValue(Settings,JsonSerializer.Deserialize<WidgetOptions>(value.GetRawText())??new());
    foreach(string field in new[]{"Topmost","Transparent","ReduceMotion"})if(json.TryGetProperty(field,out var value)&&(value.ValueKind==JsonValueKind.True||value.ValueKind==JsonValueKind.False))typeof(Preferences).GetProperty(field)!.SetValue(Settings,value.GetBoolean());
    if(json.TryGetProperty("View",out var view))Settings.Layout=view.GetString()??"Dashboard";
    if(json.TryGetProperty("AnimateCount",out var motion))Settings.Animate=motion.GetBoolean();
    if(json.TryGetProperty("Source",out var selection)){string? source=selection.GetString();Settings.Enabled["Codex"]=source!="Claude Code";Settings.Enabled["Claude Code"]=source!="Codex";}
    Save();
   }
-  Note="Imported a separate copy of legacy history. The original cache was not changed.";
+  Note=imported>0?"Imported "+imported+" separate history cache(s). The original was not changed."+(skipped>0?" Existing target caches were kept.":""):skipped>0?"Existing provider caches were not replaced. Use a new --data folder to import legacy history.":"No legacy history caches were found in that folder.";
  }
  public void Dispose(){foreach(var p in Providers){p.Builtin?.Dispose();p.External?.Dispose();}}
  public static string? Option(string[] args,string key){int index=Array.IndexOf(args,key);return index>=0&&index+1<args.Length?args[index+1]:null;}

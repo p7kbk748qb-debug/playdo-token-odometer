@@ -34,17 +34,19 @@
       <Border Classes="panel"><StackPanel Spacing="8"><TextBlock Text="Other AI apps" FontWeight="SemiBold"/><TextBlock Text="Web chats and apps that don’t expose local token reports cannot be counted reliably. This release does not read browser sessions, collect account keys, or estimate usage from message length." Classes="muted" TextWrapping="Wrap"/></StackPanel></Border>
      </StackPanel>
      <StackPanel x:Name="AppearancePage" IsVisible="False" Spacing="20">
-      <StackPanel Spacing="6"><TextBlock Text="Choose a starting point" FontSize="17" FontWeight="SemiBold"/><TextBlock Text="Themes apply a full palette and font pair. Fine-tune either font below." Classes="muted" TextWrapping="Wrap"/></StackPanel>
-      <UniformGrid x:Name="ThemeGallery" Columns="3"/>
       <Grid ColumnDefinitions="*,16,*"><StackPanel Spacing="8"><TextBlock Text="Interface font" FontWeight="Medium"/><ComboBox x:Name="InterfaceFont" HorizontalAlignment="Stretch" AutomationProperties.Name="Interface font"/></StackPanel><StackPanel Grid.Column="2" Spacing="8"><TextBlock Text="Number font" FontWeight="Medium"/><ComboBox x:Name="CounterFont" HorizontalAlignment="Stretch" AutomationProperties.Name="Number font"/></StackPanel></Grid>
-      <Border Classes="panel"><StackPanel Spacing="12"><TextBlock Text="LIVE PREVIEW" Classes="muted" FontSize="10"/><Viewbox Height="54" Stretch="Uniform" StretchDirection="DownOnly" HorizontalAlignment="Left"><TextBlock x:Name="NumberPreview" Text="396,659,182" FontSize="48" Foreground="{DynamicResource Accent}"/></Viewbox><TextBlock x:Name="FontNote" Classes="muted" TextWrapping="Wrap"/></StackPanel></Border>
+      <Border Classes="panel" Padding="16"><StackPanel Spacing="8"><Viewbox Height="46" Stretch="Uniform" StretchDirection="DownOnly" HorizontalAlignment="Left"><TextBlock x:Name="NumberPreview" Text="396,659,182" FontSize="48" Foreground="{DynamicResource Accent}"/></Viewbox><TextBlock x:Name="FontNote" Classes="muted" TextWrapping="Wrap"/></StackPanel></Border>
+      <StackPanel Spacing="6"><TextBlock Text="Choose a starting point" FontSize="17" FontWeight="SemiBold"/><TextBlock Text="Themes apply a full palette and font pair. Fine-tune either font above." Classes="muted" TextWrapping="Wrap"/></StackPanel>
+      <UniformGrid x:Name="ThemeGallery" Columns="3"/>
       <CheckBox x:Name="AnimateCheck" Content="Animate token increases"/><CheckBox x:Name="MotionCheck" Content="Reduce motion"/>
      </StackPanel>
      <StackPanel x:Name="SettingsPage" IsVisible="False" Spacing="18">
       <TextBlock Text="Desktop widget" FontSize="17" FontWeight="SemiBold"/>
       <CheckBox x:Name="TopmostCheck" Content="Keep the widget above other windows"/>
+      <CheckBox x:Name="PauseCheck" Content="Pause collection (resume catches up)"/>
       <CheckBox x:Name="TransparentCheck" Content="Use a transparent widget background"/>
       <CheckBox x:Name="QuotaCheck" Content="Show Codex allowance in Mini and Compact"/>
+      <StackPanel Spacing="10"><TextBlock Text="Mini &amp; Compact content" FontSize="16" FontWeight="SemiBold"/><ComboBox x:Name="WidgetOptionsChoice" Width="200" HorizontalAlignment="Left" AutomationProperties.Name="Widget to configure"/><StackPanel x:Name="WidgetOptionRows" Spacing="8"/></StackPanel>
       <StackPanel Spacing="8"><TextBlock Text="Screen corner"/><ComboBox x:Name="CornerChoice" Width="200" HorizontalAlignment="Left" AutomationProperties.Name="Screen corner"/></StackPanel>
       <Border Classes="panel"><StackPanel Spacing="8"><TextBlock Text="Local data" FontSize="16" FontWeight="SemiBold"/><TextBlock x:Name="DataPath" Classes="muted" TextWrapping="Wrap"/><TextBlock Text="The data folder holds aggregate counts, settings, and hashed replay metadata. It does not store your conversation bodies." Classes="muted" TextWrapping="Wrap"/><Button x:Name="DataButton" Content="Open data folder" HorizontalAlignment="Left"/></StackPanel></Border>
       <TextBlock Text="Close the window to keep tracking in the menu bar or system tray. Use Exit to stop the collector. Drag widgets by the number or background; right-click to change views." Classes="muted" TextWrapping="Wrap"/>
@@ -58,8 +60,14 @@
    <Grid RowDefinitions="Auto,*,Auto">
     <Grid x:Name="WidgetHeader" ColumnDefinitions="*,Auto"><TextBlock x:Name="WidgetScope" Classes="muted" VerticalAlignment="Center" FontSize="11"/><StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="4"><Button x:Name="WidgetSettings" Content="Settings" Padding="8,3" MinHeight="28"/><Button x:Name="WidgetExpand" Content="Expand" Padding="8,3" MinHeight="28"/><Button x:Name="WidgetHide" Content="Hide" Padding="8,3" MinHeight="28"/></StackPanel></Grid>
     <Viewbox Grid.Row="1" Stretch="Uniform" StretchDirection="DownOnly" HorizontalAlignment="Left" Margin="0,5,0,0"><TextBlock x:Name="WidgetNumber" Text="—" FontSize="56" Foreground="{DynamicResource Accent}"/></Viewbox>
-    <StackPanel x:Name="WidgetDetails" Grid.Row="2" Spacing="6"><TextBlock x:Name="WidgetBreakdown" Classes="muted" FontSize="12"/><TextBlock x:Name="WidgetAllowance" Classes="muted" FontSize="11" TextWrapping="Wrap"/></StackPanel>
-    <StackPanel x:Name="TinyActions" IsVisible="False" Grid.RowSpan="3" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top"><Button x:Name="TinyHide" Content="–" AutomationProperties.Name="Hide Tiny" ToolTip.Tip="Hide to tray" MinHeight="18" Height="18" Width="18" Padding="0"/><Button x:Name="TinyExpand" Content="↗" AutomationProperties.Name="Expand Tiny" ToolTip.Tip="Open dashboard" MinHeight="18" Height="18" Width="18" Padding="0"/></StackPanel>
+    <StackPanel x:Name="WidgetDetails" Grid.Row="2" Spacing="7">
+     <TextBlock x:Name="WidgetBreakdown" Classes="muted" FontSize="12"/>
+     <TextBlock x:Name="WidgetModel" Classes="muted" FontSize="11" TextTrimming="CharacterEllipsis"/>
+     <StackPanel x:Name="WidgetPrimary" Spacing="4"><TextBlock x:Name="WidgetPrimaryText" Classes="muted" FontSize="11"/><ProgressBar x:Name="WidgetPrimaryBar" Height="4" Maximum="100" Foreground="{DynamicResource Accent}"/><TextBlock x:Name="WidgetPrimaryReset" Classes="muted" FontSize="10"/></StackPanel>
+     <StackPanel x:Name="WidgetWeekly" Spacing="4"><TextBlock x:Name="WidgetWeeklyText" Classes="muted" FontSize="11"/><ProgressBar x:Name="WidgetWeeklyBar" Height="4" Maximum="100" Foreground="{DynamicResource Signal}"/><TextBlock x:Name="WidgetWeeklyReset" Classes="muted" FontSize="10"/></StackPanel>
+     <TextBlock x:Name="WidgetActivity" Classes="muted" FontSize="11" TextTrimming="CharacterEllipsis"/>
+    </StackPanel>
+    <StackPanel x:Name="TinyActions" IsVisible="False" Grid.RowSpan="3" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top"><Button x:Name="TinyHide" AutomationProperties.Name="Hide Tiny" ToolTip.Tip="Hide to tray" MinHeight="18" Height="18" Width="18" Padding="0"><Path Data="M 1,5 H 9" Stroke="{DynamicResource Muted}" StrokeThickness="1.2" Width="10" Height="10"/></Button><Button x:Name="TinyExpand" AutomationProperties.Name="Expand Tiny" ToolTip.Tip="Open dashboard" MinHeight="18" Height="18" Width="18" Padding="0"><Path Data="M 1,4 V 1 H 4 M 6,1 H 9 V 4 M 9,6 V 9 H 6 M 4,9 H 1 V 6" Stroke="{DynamicResource Muted}" StrokeThickness="1.2" Width="10" Height="10"/></Button></StackPanel>
    </Grid>
   </Border>
  </Grid>

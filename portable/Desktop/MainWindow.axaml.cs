@@ -26,7 +26,7 @@ public partial class MainWindow:Window {
  TextBlock Label(string text,double size=13,string? color=null)=>new(){Text=text,FontSize=size,Foreground=color==null?Foreground:color=="#A9B6C6"&&Resources.TryGetResource("Muted",ActualThemeVariant,out var muted)?(IBrush)muted!:Brush.Parse(color)};
  public MainWindow():this(new TrackerService(new[]{"--data",Path.Combine(Path.GetTempPath(),"odometer-design-"+Guid.NewGuid().ToString("N"))})){}
  public MainWindow(TrackerService tracker){
-  InitializeComponent();service=tracker;
+  InitializeComponent();service=tracker;if(Program.Arguments.Contains("--smoke"))service.Settings.Scope="Recorded";
   Find<ComboBox>("LayoutChoice").ItemsSource=Layouts;Find<ComboBox>("LayoutChoice").SelectedItem=Layouts.Contains(service.Settings.Layout)?service.Settings.Layout:"Dashboard";
   Find<ComboBox>("ScopeChoice").ItemsSource=Scopes;Find<ComboBox>("ScopeChoice").SelectedItem=Scopes.Contains(service.Settings.Scope)?service.Settings.Scope:"Today";
   Find<ComboBox>("CornerChoice").ItemsSource=Corners;Find<ComboBox>("CornerChoice").SelectedItem=Corners.Contains(service.Settings.Corner)?service.Settings.Corner:"Free";
@@ -44,6 +44,8 @@ public partial class MainWindow:Window {
    service.Settings.Corner="Free";service.Save();BeginMoveDrag(e);
   };
   var menu=new ContextMenu();foreach(string name in Layouts){string layout=name;var item=new MenuItem{Header=layout};item.Click+=(_,_)=>SetLayout(layout);menu.Items.Add(item);}
+  menu.Items.Add(new Separator());foreach(string period in Scopes){string selected=period;var scopeItem=new MenuItem{Header=period};scopeItem.Click+=(_,_)=>{service.Settings.Scope=selected;Find<ComboBox>("ScopeChoice").SelectedItem=selected;service.Save();Render();};menu.Items.Add(scopeItem);}
+  var providerItem=new MenuItem{Header="Providers"};providerItem.Click+=(_,_)=>{SetLayout("Dashboard");Navigate("Providers");};menu.Items.Add(providerItem);var appearanceItem=new MenuItem{Header="Appearance"};appearanceItem.Click+=(_,_)=>{SetLayout("Dashboard");Navigate("Appearance");};menu.Items.Add(appearanceItem);
   menu.Items.Add(new Separator());var copy=new MenuItem{Header="Copy token total"};copy.Click+=async(_,_)=>await Copy();menu.Items.Add(copy);Find<Border>("Widget").ContextMenu=menu;
   Find<Button>("CopyButton").Click+=async(_,_)=>await Copy();
   Find<Button>("ExportButton").Click+=async(_,_)=>await Export();
@@ -52,12 +54,13 @@ public partial class MainWindow:Window {
   Closing+=(_,e)=>{if(!exiting&&!Program.Arguments.Contains("--smoke")){e.Cancel=true;Hide();}};
   PropertyChanged+=(_,e)=>{if(e.Property==IsVisibleProperty||e.Property==WindowStateProperty){if(IsVisible&&WindowState!=WindowState.Minimized){refresh.Start();Render();}else{refresh.Stop();Settle();}}};
   BindCheck("TopmostCheck",()=>service.Settings.Topmost,v=>{service.Settings.Topmost=v;Topmost=v;});
+  BindCheck("PauseCheck",()=>service.Settings.Paused,v=>service.Pause(v));
   BindCheck("TransparentCheck",()=>service.Settings.Transparent,v=>{service.Settings.Transparent=v;ApplyTheme();});
   BindCheck("QuotaCheck",()=>service.Settings.ShowAllowance,v=>service.Settings.ShowAllowance=v);
   BindCheck("AnimateCheck",()=>service.Settings.Animate,v=>{service.Settings.Animate=v;Settle();});
   BindCheck("MotionCheck",()=>service.Settings.ReduceMotion,v=>{service.Settings.ReduceMotion=v;Settle();});
   Find<TextBlock>("DataPath").Text=service.DataFolder;
-  BuildProviders();BuildThemes();BuildFonts();ApplyTheme();
+  BuildProviders();BuildThemes();BuildFonts();BuildWidgetSettings();ApplyTheme();
   refresh.Tick+=(_,_)=>Render();
   motion.Tick+=(_,_)=>{double t=Math.Clamp(clock.Elapsed.TotalMilliseconds/300,0,1);shown=from+(long)(((decimal)target-from)*(decimal)(1-Math.Pow(1-t,3)));Paint(shown);if(t>=1)motion.Stop();};
   Opened+=(_,_)=>{SetLayout(service.Settings.Layout);Render();if(Program.Arguments.Contains("--smoke"))DispatcherTimer.RunOnce(()=>FinishSmoke(),TimeSpan.FromSeconds(4));};
@@ -81,7 +84,7 @@ public partial class MainWindow:Window {
    var actions=new StackPanel{Orientation=Avalonia.Layout.Orientation.Horizontal,Spacing=8};var choose=new Button{Content="Choose folder"};var check=new Button{Content="Check for reports"};actions.Children.Add(choose);actions.Children.Add(check);body.Children.Add(actions);
    checkbox.IsCheckedChanged+=(_,_)=>{service.Select(provider.Name,checkbox.IsChecked==true);Render();};
    check.Click+=(_,_)=>{service.Refresh();Render();};
-   choose.Click+=async(_,_)=>{var folders=await StorageProvider.OpenFolderPickerAsync(new FolderPickerOpenOptions{Title="Select "+provider.Name+" home folder",AllowMultiple=false});if(folders.Count>0){string? path=folders[0].TryGetLocalPath();if(path!=null){service.SetRoot(provider.Name,path);folder.Text=path;Find<TextBlock>("Feedback").Text=service.Note;}}};
+   choose.Click+=async(_,_)=>{var folders=await StorageProvider.OpenFolderPickerAsync(new FolderPickerOpenOptions{Title="Select "+provider.Name+" home folder",AllowMultiple=false});if(folders.Count>0){string? path=folders[0].TryGetLocalPath();if(path!=null){try{service.SetRoot(provider.Name,path);folder.Text=path;Find<TextBlock>("Feedback").Text=service.Note;}catch(IOException){Find<TextBlock>("Feedback").Text="The previous collector is still finishing a read. Try again after it stops.";}}}};
    panel.Children.Add(new Border{Child=body,Background=Brush.Parse("#20262F"),CornerRadius=new CornerRadius(10),Padding=new Thickness(20)});
   }
  }
@@ -116,13 +119,18 @@ public partial class MainWindow:Window {
   foreach(var border in Find<StackPanel>("ProviderRows").Children.OfType<Border>()){border.Background=Brush.Parse(theme.Surface);foreach(var label in border.GetVisualDescendants().OfType<TextBlock>())label.Foreground=Brush.Parse(theme.Muted);}
   foreach(var status in providerStatus.Values)status.Foreground=Brush.Parse(theme.Signal);
   foreach(var button in Find<UniformGrid>("ThemeGallery").Children.OfType<Button>()){button.BorderThickness=new Thickness(2);button.BorderBrush=button.Content is StackPanel body&&body.Children[0] is TextBlock title&&title.Text==theme.Name?Brush.Parse(theme.Accent):Brushes.Transparent;}
+  foreach(string name in new[]{"Overview","Providers","Appearance","Settings"})Find<Button>(name+"Nav").Background=name==page?Brush.Parse(theme.Surface):Brushes.Transparent;
  }
  public void SetLayout(string requested){
-  string layout=Layouts.Contains(requested)?requested:"Dashboard";Settle();service.Settings.Layout=layout;bool full=layout=="Dashboard",tiny=layout=="Tiny";
+  bool wasSmall=service.Settings.Layout!="Dashboard";string layout=Layouts.Contains(requested)?requested:"Dashboard";Settle();service.Settings.Layout=layout;bool full=layout=="Dashboard",tiny=layout=="Tiny";
   Find<Grid>("Dashboard").IsVisible=full;Find<Border>("Widget").IsVisible=!full;Find<Grid>("WidgetHeader").IsVisible=!tiny;Find<StackPanel>("WidgetDetails").IsVisible=!tiny;Find<StackPanel>("TinyActions").IsVisible=tiny;
   SystemDecorations=full?SystemDecorations.Full:SystemDecorations.None;CanResize=full;
   MinWidth=full?760:tiny?220:320;MinHeight=full?540:tiny?52:140;
   Width=full?1080:tiny?300:layout=="Mini"?360:440;Height=full?780:tiny?68:layout=="Mini"?210:280;
+  if(full){
+   var screen=Screens.ScreenFromWindow(this)??Screens.Primary;
+   if(screen!=null){var area=screen.WorkingArea;double scale=screen.Scaling;Width=Math.Max(760,Math.Min(Width,area.Width/scale-24));Height=Math.Max(540,Math.Min(Height,area.Height/scale-24));if(wasSmall)Position=new PixelPoint(area.X+Math.Max(0,(int)((area.Width-Width*scale)/2)),area.Y+Math.Max(0,(int)((area.Height-Height*scale)/2)));}
+  }
   Find<Border>("Widget").Padding=tiny?new Thickness(10,6):new Thickness(18,14);
   Find<TextBlock>("WidgetNumber").Margin=tiny?new Thickness(0,0,40,0):new Thickness(0);
   bool was=initializing;initializing=true;Find<ComboBox>("LayoutChoice").SelectedItem=layout;initializing=was;
@@ -144,7 +152,7 @@ public partial class MainWindow:Window {
   Find<TextBlock>("SourceSummary").Text=selected?string.Join("  +  ",service.Settings.Enabled.Where(x=>x.Value).Select(x=>x.Key)):"Choose your tools in Providers";
   Find<TextBlock>("WidgetScope").Text=service.Settings.Scope+" · "+(service.Settings.Enabled.Count(x=>x.Value))+" sources";
   Find<TextBlock>("WidgetBreakdown").Text="Input "+Short(total.Input)+"  ·  Output "+Short(total.Output);
-  string allowance=FormatAllowance(snapshot.Quota);Find<TextBlock>("AllowanceText").Text=allowance;Find<TextBlock>("WidgetAllowance").Text=service.Settings.ShowAllowance&&service.Settings.Enabled.GetValueOrDefault("Codex")?allowance:"";
+  string allowance=FormatAllowance(snapshot.Quota);Find<TextBlock>("AllowanceText").Text=allowance;RenderWidget(snapshot,total);
   Find<Border>("AllowancePanel").IsVisible=service.Settings.Enabled.GetValueOrDefault("Codex");
   if(snapshot.Quota?.Windows.Count>0){var q=snapshot.Quota.Windows.OrderByDescending(x=>x.Minutes).First();Find<ProgressBar>("Allowance").Value=Expired(q)?0:100-q.Used;}
   foreach(var provider in service.Providers)providerStatus[provider.Name].Text=(service.Settings.Enabled.GetValueOrDefault(provider.Name)?provider.Snapshot.Status:"Not selected")+" · "+provider.Snapshot.Recorded.Total.ToString("N0")+" recorded tokens";
@@ -175,7 +183,13 @@ public partial class MainWindow:Window {
  static string Short(long n)=>n>=1000000000?(n/1e9).ToString("0.0")+"B":n>=1000000?(n/1e6).ToString("0.0")+"M":n>=1000?(n/1e3).ToString("0.0")+"K":n.ToString("N0");
  async void FinishSmoke(){
   try{
-   foreach(string layout in Layouts){SetLayout(layout);await Task.Delay(160);UpdateLayout();}
+   foreach(string layout in Layouts){
+    SetLayout(layout);await Task.Delay(160);UpdateLayout();
+    if(Find<Grid>("Dashboard").IsVisible!=(layout=="Dashboard"))throw new Exception("Layout visibility failed");
+    if(layout=="Tiny"&&(Math.Abs(Bounds.Width-300)>2||Math.Abs(Bounds.Height-68)>2))throw new Exception("Tiny bounds failed");
+    if(Find<TextBlock>(layout=="Dashboard"?"Total":"WidgetNumber").Text!=Current(service.Combined()).Total.ToString("N0"))throw new Exception("Visible counter does not match selected total");
+   }
+   foreach(var font in fonts.Take(20)){var preview=Find<ComboBox>("CounterFont").ItemTemplate!.Build(font) as TextBlock;if(preview==null||preview.FontFamily.Name!=font.Name)throw new Exception("Font preview did not use its own family");}
    SetLayout("Dashboard");await Task.Delay(250);UpdateLayout();
    string? capture=TrackerService.Option(Program.Arguments,"--capture");
    if(capture!=null){
