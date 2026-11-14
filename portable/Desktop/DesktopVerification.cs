@@ -10,6 +10,13 @@ public partial class MainWindow {
   using var bitmap=new RenderTargetBitmap(new PixelSize((int)root.Bounds.Width,(int)root.Bounds.Height),new Vector(96,96));bitmap.Render(root);bitmap.Save(path);
  }
  async Task VerifyDashboard(string? capture){
+  bool transparent=service.Settings.Transparent;
+  SetLayout("Tiny");service.Settings.Transparent=true;ApplyTheme();UpdateLayout();
+  if(Find<Border>("Widget").Background is not ISolidColorBrush clear||clear.Color.A!=0||Find<Border>("Widget").BorderThickness!=default)throw new Exception("Transparent widget retained a painted background or border");
+  if(capture!=null)CaptureSurface(Path.Combine(Path.GetDirectoryName(capture)!,"widget-transparent.png"));
+  service.Settings.Transparent=false;ApplyTheme();
+  if(Find<Border>("Widget").Background is not ISolidColorBrush solid||solid.Color.A!=255)throw new Exception("Solid widget did not restore opaque background");
+  service.Settings.Transparent=transparent;SetLayout("Dashboard");
   Navigate("Overview");Render();
   if(Find<Grid>("DayChart").Children.Count!=7||Find<Avalonia.Controls.Primitives.UniformGrid>("ProviderSummary").Children.Count!=4)throw new Exception("Dashboard chart or provider summary missing");
   string originalTheme=service.Settings.Theme;

@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Made transparent widget mode background-free rather than 80% opaque, including its border and action-button fills. Widget tooltips identify the selected period and providers.
+
 - Fixed square backing corners on Windows desktop widgets by matching the native window region to the rounded panel. Dashboard windows restore their normal shape.
 
 ## 0.6.1 — 2026-11-13

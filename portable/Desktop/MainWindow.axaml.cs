@@ -121,7 +121,10 @@ public partial class MainWindow:Window {
   Find<Grid>("Dashboard").Background=Brush.Parse(theme.Canvas);
   foreach(var pair in new[]{("Canvas",theme.Canvas),("Surface",theme.Surface),("Text",theme.Text),("Muted",theme.Muted),("Accent",theme.Accent),("Signal",theme.Signal),("Stroke",theme.Stroke)})Resources[pair.Item1]=Brush.Parse(pair.Item2);
   foreach(string name in new[]{"Total","WidgetNumber","NumberPreview"})Find<TextBlock>(name).Foreground=Brush.Parse(theme.Accent);
-  var color=Color.Parse(theme.Surface);if(service.Settings.Transparent)color=new Color(204,color.R,color.G,color.B);Find<Border>("Widget").Background=new SolidColorBrush(color);
+  var widget=Find<Border>("Widget");widget.Background=service.Settings.Transparent?Brushes.Transparent:Brush.Parse(theme.Surface);widget.BorderThickness=service.Settings.Transparent?new Thickness(0):new Thickness(1);
+  foreach(string name in new[]{"TinyHide","TinyExpand","WidgetSettings","WidgetExpand","WidgetHide"}){
+   var button=Find<Button>(name);if(service.Settings.Transparent){button.Background=Brushes.Transparent;button.BorderThickness=new Thickness(0);}else{button.ClearValue(Button.BackgroundProperty);button.ClearValue(Button.BorderThicknessProperty);}
+  }
   RequestedThemeVariant=theme.Light?ThemeVariant.Light:ThemeVariant.Dark;Topmost=service.Settings.Topmost;ApplyFonts();
   foreach(var border in Find<StackPanel>("ProviderRows").Children.OfType<Border>()){border.Background=Brush.Parse(theme.Surface);foreach(var label in border.GetVisualDescendants().OfType<TextBlock>())label.Foreground=Brush.Parse(theme.Muted);}
   foreach(var status in providerStatus.Values)status.Foreground=Brush.Parse(theme.Signal);
@@ -162,6 +165,7 @@ public partial class MainWindow:Window {
   foreach(var pair in new[]{("InputValue",total.Input),("OutputValue",total.Output),("CacheValue",total.Cached)})ToolTip.SetTip(Find<TextBlock>(pair.Item1),pair.Item2.ToString("N0")+" tokens");
   Find<TextBlock>("SourceSummary").Text=selected?string.Join("  +  ",service.Settings.Enabled.Where(x=>x.Value).Select(x=>x.Key)):"Choose your tools in Providers";
   Find<TextBlock>("WidgetScope").Text=service.Settings.Scope+" · "+(service.Settings.Enabled.Count(x=>x.Value))+" sources";
+  ToolTip.SetTip(Find<Border>("Widget"),service.Settings.Scope+" · "+total.Total.ToString("N0")+" tokens · "+string.Join(" + ",service.Settings.Enabled.Where(x=>x.Value).Select(x=>x.Key))+". Right-click to change period.");
   Find<TextBlock>("WidgetBreakdown").Text="Input "+Short(total.Input)+"  ·  Output "+Short(total.Output);
   RenderWidget(snapshot,total);
   Find<Border>("AllowancePanel").IsVisible=service.Settings.Enabled.GetValueOrDefault("Codex");
@@ -214,7 +218,7 @@ public partial class MainWindow:Window {
     Navigate("Appearance");UpdateLayout();CaptureSurface(capture);
     SetLayout("Tiny");await Task.Delay(180);UpdateLayout();CaptureSurface(Path.Combine(Path.GetDirectoryName(capture)!,"portable-tiny.png"));
    }
-   string? report=TrackerService.Option(Program.Arguments,"--report");if(report!=null)File.WriteAllText(report,System.Text.Json.JsonSerializer.Serialize(new{Version="0.6.1",WindowReady=true,FontDropdownChecks=true,DashboardChecks=true,Layouts=Layouts,Fonts=fonts.Count,Total=service.Combined().Recorded.Total,Providers=service.Providers.Count}));
+   string? report=TrackerService.Option(Program.Arguments,"--report");if(report!=null)File.WriteAllText(report,System.Text.Json.JsonSerializer.Serialize(new{Version="0.6.1",Transparency=ActualTransparencyLevel.ToString(),WindowReady=true,FontDropdownChecks=true,DashboardChecks=true,Layouts=Layouts,Fonts=fonts.Count,Total=service.Combined().Recorded.Total,Providers=service.Providers.Count}));
   }catch(Exception e){Console.Error.WriteLine(e);Environment.ExitCode=1;}
   finally{exiting=true;(Application.Current?.ApplicationLifetime as Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime)?.Shutdown(Environment.ExitCode);}
  }
