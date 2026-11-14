@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Fixed square backing corners on Windows desktop widgets by matching the native window region to the rounded panel. Dashboard windows restore their normal shape.
+
 ## 0.6.1 — 2026-11-13
 
 - Fixed a font-dropdown crash when Avalonia recycles an empty item. Added native open, scroll, select and reopen regression checks for both font pickers.

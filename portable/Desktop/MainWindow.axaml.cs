@@ -68,7 +68,8 @@ public partial class MainWindow:Window {
   motion.Tick+=(_,_)=>{double t=Math.Clamp(clock.Elapsed.TotalMilliseconds/300,0,1);shown=from+(long)(((decimal)target-from)*(decimal)(1-Math.Pow(1-t,3)));Paint(shown);if(t>=1)motion.Stop();};
   Opened+=(_,_)=>{SetLayout(service.Settings.Layout);Render();if(Program.Arguments.Contains("--smoke")&&!Program.Arguments.Contains("--inspect"))DispatcherTimer.RunOnce(()=>FinishSmoke(),TimeSpan.FromSeconds(4));};
   KeyDown+=(_,e)=>{if((e.KeyModifiers&(KeyModifiers.Control|KeyModifiers.Meta))==0)return;if(e.Key==Key.T){SetLayout("Tiny");e.Handled=true;}if(e.Key==Key.Escape){SetLayout("Dashboard");e.Handled=true;}};
-  SizeChanged+=(_,_)=>{Find<UniformGrid>("ThemeGallery").Columns=Bounds.Width<900?2:3;ArrangeAnalytics();};
+  SizeChanged+=(_,_)=>{Find<UniformGrid>("ThemeGallery").Columns=Bounds.Width<900?2:3;ArrangeAnalytics();UpdateWindowShape();};
+  PropertyChanged+=(_,e)=>{if(e.Property.Name==nameof(RenderScaling))UpdateWindowShape();};
   effects.Tick+=(_,_)=>StepEffects();
   initializing=false;refresh.Start();
  }
@@ -142,7 +143,7 @@ public partial class MainWindow:Window {
   Find<Border>("Widget").Padding=tiny?new Thickness(10,6):new Thickness(18,14);
   Find<TextBlock>("WidgetNumber").Margin=tiny?new Thickness(0,0,40,0):new Thickness(0);
   bool was=initializing;initializing=true;Find<ComboBox>("LayoutChoice").SelectedItem=layout;initializing=was;
-  service.Save();numberContext="";ApplyTheme();Render();Place();
+  service.Save();numberContext="";ApplyTheme();Render();Place();UpdateWindowShape();
  }
  void Place(){if(service.Settings.Layout=="Dashboard"||service.Settings.Corner=="Free")return;var screen=Screens.ScreenFromWindow(this);if(screen==null)return;var area=screen.WorkingArea;double scale=screen.Scaling;bool right=service.Settings.Corner.EndsWith("right"),bottom=service.Settings.Corner.StartsWith("Bottom");Position=new PixelPoint(right?area.Right-(int)(Width*scale)-12:area.X+12,bottom?area.Bottom-(int)(Height*scale)-12:area.Y+12);}
  public void Reveal(){Show();WindowState=WindowState.Normal;Activate();Render();}
@@ -188,6 +189,7 @@ public partial class MainWindow:Window {
   try{
    foreach(string layout in Layouts){
     SetLayout(layout);await Task.Delay(160);UpdateLayout();
+    VerifyWindowShape(layout);
     if(Find<Grid>("Dashboard").IsVisible!=(layout=="Dashboard"))throw new Exception("Layout visibility failed");
     if(layout=="Tiny"&&(Math.Abs(Bounds.Width-300)>2||Math.Abs(Bounds.Height-68)>2))throw new Exception("Tiny bounds failed");
     if(Find<TextBlock>(layout=="Dashboard"?"Total":"WidgetNumber").Text!=Current(service.Combined()).Total.ToString("N0"))throw new Exception("Visible counter does not match selected total");
