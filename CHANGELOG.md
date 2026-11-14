@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.6.1 — 2026-11-13
+
+- Fixed a font-dropdown crash when Avalonia recycles an empty item. Added native open, scroll, select and reopen regression checks for both font pickers.
+- Corrected bundled Inter font resolution, keeping installed font previews and all ten presets.
+- Redesigned the dashboard with provider totals, an actual seven-day usage chart, separate allowance windows/reset times, cache share, report freshness and expandable model breakdowns.
+- Refined navigation, typography, controls and narrow-window layout without removing providers, widget modes, transparency, exports or settings.
+- Added optional 220 ms interface/chart effects. Reduce motion overrides them; hidden windows stop refresh and animation timers.
+
 ## 0.6.0 — 2026-11-12
 
 - Added self-contained native desktop packages for Windows x64, Apple Silicon Macs and Intel Macs.

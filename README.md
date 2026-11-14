@@ -6,11 +6,11 @@ Track the tools you use. Choose a look that fits your desktop. Keep the full das
 
 **Free and open source. Local records. No account keys or background AI calls.**
 
-| Download v0.6.0 | Package |
+| Download v0.6.1 | Package |
 | --- | --- |
-| [Windows x64](https://github.com/p7kbk748qb-debug/playdo-token-odometer/releases/latest/download/PlayDo-Token-Odometer-0.6.0-win-x64.zip) | Self-contained ZIP |
-| [Mac — Apple Silicon](https://github.com/p7kbk748qb-debug/playdo-token-odometer/releases/latest/download/PlayDo-Token-Odometer-0.6.0-osx-arm64.dmg) | Drag-to-Applications DMG |
-| [Mac — Intel](https://github.com/p7kbk748qb-debug/playdo-token-odometer/releases/latest/download/PlayDo-Token-Odometer-0.6.0-osx-x64.dmg) | Drag-to-Applications DMG |
+| [Windows x64](https://github.com/p7kbk748qb-debug/playdo-token-odometer/releases/latest/download/PlayDo-Token-Odometer-0.6.1-win-x64.zip) | Self-contained ZIP |
+| [Mac — Apple Silicon](https://github.com/p7kbk748qb-debug/playdo-token-odometer/releases/latest/download/PlayDo-Token-Odometer-0.6.1-osx-arm64.dmg) | Drag-to-Applications DMG |
+| [Mac — Intel](https://github.com/p7kbk748qb-debug/playdo-token-odometer/releases/latest/download/PlayDo-Token-Odometer-0.6.1-osx-x64.dmg) | Drag-to-Applications DMG |
 
 [Release notes and SHA256 checksums](https://github.com/p7kbk748qb-debug/playdo-token-odometer/releases/latest) · [Project website](https://p7kbk748qb-debug.github.io/playdo-token-odometer/) · [MIT license](LICENSE)
 

@@ -39,12 +39,12 @@ jobs:
           $ErrorActionPreference='Stop'
           $runtime='${{ matrix.runtime }}'
           if ($runtime -eq 'win-x64') {
-            $package=(Resolve-Path "release/PlayDo-Token-Odometer-0.6.0-$runtime.zip").Path
+            $package=(Resolve-Path "release/PlayDo-Token-Odometer-0.6.1-$runtime.zip").Path
             $extracted=Join-Path $PWD 'build/extracted'
             Expand-Archive -LiteralPath $package -DestinationPath $extracted
             $exe=Join-Path $extracted 'PlayDoTokenOdometer.exe'
           } else {
-            $package=(Resolve-Path "release/PlayDo-Token-Odometer-0.6.0-$runtime.dmg").Path
+            $package=(Resolve-Path "release/PlayDo-Token-Odometer-0.6.1-$runtime.dmg").Path
             $mount=Join-Path $PWD 'build/dmg-mount'
             New-Item -ItemType Directory -Path $mount -Force | Out-Null
             hdiutil attach $package -nobrowse -readonly -mountpoint $mount
@@ -64,4 +64,5 @@ jobs:
             release/*-${{ matrix.runtime }}.*
             build/desktop-check-*/appearance*.png
             build/desktop-check-*/portable-tiny.png
+            build/desktop-check-*/dashboard-*.png
           if-no-files-found: error

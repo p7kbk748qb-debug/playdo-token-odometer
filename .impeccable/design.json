@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-14T00:48:02Z",
+  "title": "Design System: PlayDo’s Token Odometer",
+  "extensions": {
+    "motion": [
+      {
+        "name": "interface-effect",
+        "value": "220ms; cubic ease-out: 1 - (1 - p)^3",
+        "purpose": "Optional native page continuity and chart scale; reduced motion overrides it and hidden windows stop the timer."
+      },
+      {
+        "name": "token-count-up",
+        "value": "300ms; cubic ease-out: 1 - (1 - p)^3",
+        "purpose": "Optional same-context token increases; separate from interface effects, with reduced-motion and hidden-window overrides."
+      }
+    ],
+    "breakpoints": [
+      { "name": "analytics-side-by-side", "value": "1000 DIP" },
+      { "name": "four-provider-columns", "value": "940 DIP" },
+      { "name": "three-preset-columns", "value": "900 DIP" }
+    ]
+  },
+  "components": [],
+  "narrative": {
+    "northStar": "Clean instrument panel",
+    "overview": "The owner selected charcoal surfaces, crisp typography, cyan signals and amber numerals. This is a native operating tool for Windows and macOS: exact data, clear states and direct controls lead the presentation. Preserve the transparent gauge identity while allowing users to choose their own palette, typography and desktop layout.",
+    "keyCharacteristics": [
+      "Exact token totals with supporting detail kept subordinate.",
+      "Flat, compact navigation and native controls.",
+      "Ten coordinated presets with independent interface and number fonts.",
+      "Optional, bounded motion that respects reduced motion and hidden windows."
+    ],
+    "rules": [],
+    "dos": [
+      "Do preserve all providers, themes, font choices, window modes, transparency, exports and widget controls during visual refinements.",
+      "Do use semantic palette resources in both XAML and dynamically built controls.",
+      "Do verify native font popups, light/dark presets, narrow layouts and hidden/reduced-motion states.",
+      "Do distinguish not detected, unselected, importing, tracking, expired and unavailable states."
+    ],
+    "donts": [
+      "Don't add background font downloads or continuous decorative animation.",
+      "Don't round the primary exact token count to make it fit.",
+      "Don't present account allowance as token totals, subscription credits or billing data.",
+      "Don't imply support for web conversations or account integrations that the local reports do not provide."
+    ]
+  }
+}

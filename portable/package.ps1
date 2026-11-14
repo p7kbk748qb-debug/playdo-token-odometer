@@ -1,7 +1,7 @@
 param([Parameter(Mandatory=$true)][ValidateSet('win-x64','osx-x64','osx-arm64')][string]$Runtime)
 $ErrorActionPreference='Stop'
 $root=Split-Path $PSScriptRoot -Parent
-$version='0.6.0'
+$version='0.6.1'
 $release=Join-Path $root 'release'
 $stage=Join-Path $root ('build\portable-'+$Runtime+'-'+[Guid]::NewGuid().ToString('N'))
 $publish=Join-Path $stage 'published'

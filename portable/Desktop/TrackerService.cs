@@ -22,6 +22,7 @@ public sealed class Preferences {
  public bool Topmost {get;set;}
  public bool Transparent {get;set;}
  public bool Animate {get;set;}
+ public bool Effects {get;set;}=true;
  public bool ReduceMotion {get;set;}
  public bool Paused {get;set;}
  public bool ShowAllowance {get;set;}=true;
