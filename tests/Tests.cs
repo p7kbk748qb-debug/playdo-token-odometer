@@ -53,6 +53,31 @@ class Tests {
   Check("older metadata replay cannot rewind live attribution",delegate{var l=new UsageLedger();l.Accept("s",Meta("turn_context",b,"gpt-b",@"C:\Beta"));l.Accept("s",E(100,5,b));l.Accept("s",Meta("turn_context",a,"gpt-a",@"C:\Alpha"));l.Accept("s",E(150,10,c));Eq(Group(l.Models,"gpt-b",DateTime.MinValue).Total,160);Eq(l.Models.Count,1);});
   string dir=Path.Combine(AppDomain.CurrentDomain.BaseDirectory,"test-fixtures-"+Guid.NewGuid().ToString("N"));Directory.CreateDirectory(dir);
   try {
+   Check("throttled append remains dirty and is checkpointed without another event",delegate{
+    string home=Path.Combine(dir,"checkpoint-throttle-home"),data=Path.Combine(dir,"checkpoint-throttle-data");Directory.CreateDirectory(Path.Combine(home,"sessions"));
+    string file=Path.Combine(home,"sessions","rollout-01234567-1234-1234-1234-012345678901.jsonl");File.WriteAllText(file,E(100,5,a)+"\n",new UTF8Encoding(false));
+    long ticks=new DateTime(2026,11,15,12,0,0,DateTimeKind.Utc).Ticks,persisted=-1;int saves=0;
+    using(var collector=new Collector(home,data,()=>new DateTime(Interlocked.Read(ref ticks),DateTimeKind.Utc),delegate(string path,SavedState value){Store.Save(path,value);Interlocked.Exchange(ref persisted,value.Ledger.TotalFor(DateTime.MinValue).Total);Interlocked.Increment(ref saves);})){
+     collector.Start();Wait(()=>Interlocked.CompareExchange(ref saves,0,0)>0&&Interlocked.Read(ref persisted)==105);
+     Interlocked.Add(ref ticks,TimeSpan.FromMilliseconds(100).Ticks);File.AppendAllText(file,E(150,10,b)+"\n",new UTF8Encoding(false));
+     Wait(()=>collector.GetSnapshot().Recorded.Total==160);Eq(Interlocked.Read(ref persisted),105);
+     Interlocked.Add(ref ticks,TimeSpan.FromSeconds(11).Ticks);
+     Wait(()=>Interlocked.Read(ref persisted)==160,3000);
+     string json=ReplayDatabase.LoadReadOnly(Path.Combine(data,"usage-v3.db"));var checkpoint=new JavaScriptSerializer().Deserialize<SavedState>(json);Eq(checkpoint.Ledger.TotalFor(DateTime.MinValue).Total,160);
+    }
+    using(var collector=new Collector(home,data)){collector.Start();Wait(()=>collector.GetSnapshot().Recorded.Total==160&&!collector.GetSnapshot().Indexing);Eq(collector.GetSnapshot().Bytes,0);}
+   });
+   Check("failed checkpoint stays dirty and retries without new input",delegate{
+    string home=Path.Combine(dir,"checkpoint-failure-home"),data=Path.Combine(dir,"checkpoint-failure-data");Directory.CreateDirectory(Path.Combine(home,"sessions"));
+    string file=Path.Combine(home,"sessions","rollout-01234567-1234-1234-1234-012345678902.jsonl");File.WriteAllText(file,E(100,5,a)+"\n",new UTF8Encoding(false));
+    long ticks=new DateTime(2026,11,15,12,0,0,DateTimeKind.Utc).Ticks,persisted=-1;int fail=0,failures=0;
+    using(var collector=new Collector(home,data,()=>new DateTime(Interlocked.Read(ref ticks),DateTimeKind.Utc),delegate(string path,SavedState value){if(Interlocked.CompareExchange(ref fail,0,0)!=0){Interlocked.Increment(ref failures);throw new IOException("Synthetic checkpoint failure");}Store.Save(path,value);Interlocked.Exchange(ref persisted,value.Ledger.TotalFor(DateTime.MinValue).Total);})){
+     collector.Start();Wait(()=>Interlocked.Read(ref persisted)==105);Interlocked.Exchange(ref fail,1);Interlocked.Add(ref ticks,TimeSpan.FromSeconds(11).Ticks);
+     File.AppendAllText(file,E(150,10,b)+"\n",new UTF8Encoding(false));Wait(()=>Interlocked.CompareExchange(ref failures,0,0)>0);Eq(Interlocked.Read(ref persisted),105);
+     Interlocked.Exchange(ref fail,0);Wait(()=>Interlocked.Read(ref persisted)==160,3000);
+     var checkpoint=new JavaScriptSerializer().Deserialize<SavedState>(ReplayDatabase.LoadReadOnly(Path.Combine(data,"usage-v3.db")));Eq(checkpoint.Ledger.TotalFor(DateTime.MinValue).Total,160);
+    }
+   });
    Check("collector follows appends and warm restart reads zero bytes",delegate{
     string home=Path.Combine(dir,"codex"),data=Path.Combine(dir,"data");Directory.CreateDirectory(Path.Combine(home,"sessions"));
     string p=Path.Combine(home,"sessions","rollout-01234567-1234-1234-1234-012345678901.jsonl");File.WriteAllText(p,E(100,5,a)+"\n",new UTF8Encoding(false));
@@ -122,5 +147,5 @@ class Tests {
   } finally { Directory.Delete(dir,true); }
   Console.WriteLine(passed+" passed, "+failed+" failed");return failed==0?0:1;
  }
- static void Wait(Func<bool> predicate){DateTime end=DateTime.UtcNow.AddSeconds(10);while(DateTime.UtcNow<end){if(predicate())return;Thread.Sleep(40);}throw new Exception("timed out waiting for observed usage");}
+ static void Wait(Func<bool> predicate,int timeoutMs=10000){DateTime end=DateTime.UtcNow.AddMilliseconds(timeoutMs);while(DateTime.UtcNow<end){if(predicate())return;Thread.Sleep(40);}throw new Exception("timed out waiting for observed usage");}
 }
