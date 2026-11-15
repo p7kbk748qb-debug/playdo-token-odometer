@@ -1,6 +1,7 @@
 <Window xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" x:Class="PlayDo.Desktop.MainWindow"
- Title="PlayDo’s Token Odometer" Width="1080" Height="780" MinWidth="760" MinHeight="540" Background="{DynamicResource Canvas}" WindowStartupLocation="CenterScreen"
+ Title="PlayDo’s Token Odometer" Width="1080" Height="780" MinWidth="760" MinHeight="540" Background="Transparent" WindowStartupLocation="CenterScreen"
  TransparencyLevelHint="Transparent" Icon="/Assets/app.ico">
+ <!-- ApplyTheme owns window paint; a Canvas resource binding can repaint transparent widgets. -->
  <Grid x:Name="Root">
   <Grid x:Name="Dashboard" ColumnDefinitions="184,*">
    <Border Background="{DynamicResource Surface}" BorderBrush="{DynamicResource Stroke}" BorderThickness="0,0,1,0" Padding="16,24"><DockPanel>

@@ -11,12 +11,21 @@ public partial class MainWindow {
  }
  async Task VerifyDashboard(string? capture){
   bool transparent=service.Settings.Transparent;
-  SetLayout("Tiny");service.Settings.Transparent=true;ApplyTheme();UpdateLayout();
+  service.Settings.Transparent=true;
+  foreach(string layout in new[]{"Mini","Compact","Tiny"}){
+   SetLayout(layout);await Task.Delay(80);UpdateLayout();
+   if(Background is not ISolidColorBrush windowBackground||windowBackground.Color.A!=0)throw new Exception("Transparent "+layout+" retained the window's own background layer: "+Background);
+  }
   if(Find<Border>("Widget").Background is not ISolidColorBrush clear||clear.Color.A!=0||Find<Border>("Widget").BorderThickness!=default)throw new Exception("Transparent widget retained a painted background or border");
-  if(capture!=null)CaptureSurface(Path.Combine(Path.GetDirectoryName(capture)!,"widget-transparent.png"));
+  if(capture!=null){
+   CaptureSurface(Path.Combine(Path.GetDirectoryName(capture)!,"widget-transparent.png"));
+   // Include the native control template, not only Root: it can paint behind a clear panel.
+   using var windowImage=new RenderTargetBitmap(new PixelSize((int)Bounds.Width,(int)Bounds.Height),new Vector(96,96));windowImage.Render(this);windowImage.Save(Path.Combine(Path.GetDirectoryName(capture)!,"window-transparent.png"));
+  }
   service.Settings.Transparent=false;ApplyTheme();
   if(Find<Border>("Widget").Background is not ISolidColorBrush solid||solid.Color.A!=255)throw new Exception("Solid widget did not restore opaque background");
   service.Settings.Transparent=transparent;SetLayout("Dashboard");
+  if(Background is not ISolidColorBrush dashboardBackground||dashboardBackground.Color.A!=255)throw new Exception("Dashboard did not restore its opaque window background");
   Navigate("Overview");Render();
   if(Find<Grid>("DayChart").Children.Count!=7||Find<Avalonia.Controls.Primitives.UniformGrid>("ProviderSummary").Children.Count!=4)throw new Exception("Dashboard chart or provider summary missing");
   string originalTheme=service.Settings.Theme;

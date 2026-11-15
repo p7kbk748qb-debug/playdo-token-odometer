@@ -218,7 +218,7 @@ public partial class MainWindow:Window {
     Navigate("Appearance");UpdateLayout();CaptureSurface(capture);
     SetLayout("Tiny");await Task.Delay(180);UpdateLayout();CaptureSurface(Path.Combine(Path.GetDirectoryName(capture)!,"portable-tiny.png"));
    }
-   string? report=TrackerService.Option(Program.Arguments,"--report");if(report!=null)File.WriteAllText(report,System.Text.Json.JsonSerializer.Serialize(new{Version="0.6.1",Transparency=ActualTransparencyLevel.ToString(),WindowReady=true,FontDropdownChecks=true,DashboardChecks=true,Layouts=Layouts,Fonts=fonts.Count,Total=service.Combined().Recorded.Total,Providers=service.Providers.Count}));
+   string? report=TrackerService.Option(Program.Arguments,"--report");if(report!=null)File.WriteAllText(report,System.Text.Json.JsonSerializer.Serialize(new{Version="0.6.2",Transparency=ActualTransparencyLevel.ToString(),WindowReady=true,FontDropdownChecks=true,DashboardChecks=true,WindowTransparencyChecks=true,Layouts=Layouts,Fonts=fonts.Count,Total=service.Combined().Recorded.Total,Providers=service.Providers.Count}));
   }catch(Exception e){Console.Error.WriteLine(e);Environment.ExitCode=1;}
   finally{exiting=true;(Application.Current?.ApplicationLifetime as Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime)?.Shutdown(Environment.ExitCode);}
  }

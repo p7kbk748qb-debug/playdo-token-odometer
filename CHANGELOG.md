@@ -1,6 +1,8 @@
 # Changelog
 
-## Unreleased
+## 0.6.2 — 2026-11-15
+
+- Fixed the window-level Canvas binding repainting transparent widgets. Regression checks now include the full window layer in all three widget modes, plus restoration of the opaque dashboard.
 
 - Fixed a throttled checkpoint incorrectly marking new usage clean before it reached disk. Pending progress now retries automatically after throttling or a failed save, without another usage event. Regression tests cover durable totals and warm restart.
 
