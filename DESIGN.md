@@ -98,7 +98,7 @@ Controls use the control radius, panels the panel radius, and desktop widgets th
 
 ## Components
 
-**Desktop views.** Preserve Dashboard, Compact, Mini and Tiny. Tiny is a 300 × 68 DIP number-first, borderless, draggable view with small hide/expand actions. Mini and Compact retain independent content choices. Transparent mode removes the widget background, border and action-button fills; text and controls stay visible. Widget tooltips identify the active period and providers.
+**Desktop views.** Preserve Dashboard, Compact, Mini and Tiny. Tiny is a 300 × 68 DIP number-first, borderless, draggable view with small hide/expand actions. Mini and Compact retain independent content choices. Widget backgrounds offer Solid, Glass and Clear. Glass uses a static theme-tinted gradient at 100/255 to 55/255 alpha with a subtle 1 DIP outline; text stays opaque. Clear removes the background, border and action-button fills. The background choice is available in Settings and the widget’s right-click menu; legacy transparency preferences retain their previous appearance.
 
 **Observed usage.** The daily chart uses actual selected-provider aggregates. A missing report is distinct from a verified observation; tooltip and coverage text retain that boundary. Model rows pair exact counts with relative share and expand beyond the initial five. Cached input remains a subset of input.
 

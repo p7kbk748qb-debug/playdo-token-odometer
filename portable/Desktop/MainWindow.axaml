@@ -47,7 +47,7 @@
       <TextBlock Text="Desktop widget" FontSize="17" FontWeight="SemiBold"/>
       <CheckBox x:Name="TopmostCheck" Content="Keep the widget above other windows"/>
       <CheckBox x:Name="PauseCheck" Content="Pause collection (resume catches up)"/>
-      <CheckBox x:Name="TransparentCheck" Content="Use a transparent widget background"/>
+      <StackPanel Spacing="8"><TextBlock Text="Widget background"/><ComboBox x:Name="BackgroundChoice" Width="220" HorizontalAlignment="Left" AutomationProperties.Name="Widget background"/><TextBlock Text="Solid panel, tinted glass, or fully clear. Text stays opaque." Classes="muted" FontSize="12" TextWrapping="Wrap"/></StackPanel>
       <CheckBox x:Name="QuotaCheck" Content="Show Codex allowance in Mini and Compact"/>
       <StackPanel Spacing="10"><TextBlock Text="Mini &amp; Compact content" FontSize="16" FontWeight="SemiBold"/><ComboBox x:Name="WidgetOptionsChoice" Width="200" HorizontalAlignment="Left" AutomationProperties.Name="Widget to configure"/><StackPanel x:Name="WidgetOptionRows" Spacing="8"/></StackPanel>
       <StackPanel Spacing="8"><TextBlock Text="Screen corner"/><ComboBox x:Name="CornerChoice" Width="200" HorizontalAlignment="Left" AutomationProperties.Name="Screen corner"/></StackPanel>

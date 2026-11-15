@@ -47,6 +47,7 @@ public partial class MainWindow:Window {
   };
   var menu=new ContextMenu();foreach(string name in Layouts){string layout=name;var item=new MenuItem{Header=layout};item.Click+=(_,_)=>SetLayout(layout);menu.Items.Add(item);}
   menu.Items.Add(new Separator());foreach(string period in Scopes){string selected=period;var scopeItem=new MenuItem{Header=period};scopeItem.Click+=(_,_)=>{service.Settings.Scope=selected;Find<ComboBox>("ScopeChoice").SelectedItem=selected;service.Save();Render();};menu.Items.Add(scopeItem);}
+  var backgroundMenu=new MenuItem{Header="Background"};foreach(string option in WidgetBackgrounds){string selected=option;var item=new MenuItem{Header=option};item.Click+=(_,_)=>SetWidgetBackground(selected);backgroundMenu.Items.Add(item);}menu.Items.Add(backgroundMenu);
   var providerItem=new MenuItem{Header="Providers"};providerItem.Click+=(_,_)=>{SetLayout("Dashboard");Navigate("Providers");};menu.Items.Add(providerItem);var appearanceItem=new MenuItem{Header="Appearance"};appearanceItem.Click+=(_,_)=>{SetLayout("Dashboard");Navigate("Appearance");};menu.Items.Add(appearanceItem);
   menu.Items.Add(new Separator());var copy=new MenuItem{Header="Copy token total"};copy.Click+=async(_,_)=>await Copy();menu.Items.Add(copy);Find<Border>("Widget").ContextMenu=menu;
   Find<Button>("CopyButton").Click+=async(_,_)=>await Copy();
@@ -57,7 +58,8 @@ public partial class MainWindow:Window {
   PropertyChanged+=(_,e)=>{if(e.Property==IsVisibleProperty||e.Property==WindowStateProperty){if(IsVisible&&WindowState!=WindowState.Minimized){refresh.Start();Render();}else{refresh.Stop();Settle();StopEffects();}}};
   BindCheck("TopmostCheck",()=>service.Settings.Topmost,v=>{service.Settings.Topmost=v;Topmost=v;});
   BindCheck("PauseCheck",()=>service.Settings.Paused,v=>service.Pause(v));
-  BindCheck("TransparentCheck",()=>service.Settings.Transparent,v=>{service.Settings.Transparent=v;ApplyTheme();});
+  var backgroundChoice=Find<ComboBox>("BackgroundChoice");backgroundChoice.ItemsSource=WidgetBackgrounds;backgroundChoice.SelectedItem=WidgetBackgroundMode;
+  backgroundChoice.SelectionChanged+=(_,_)=>{if(!initializing&&backgroundChoice.SelectedItem is string selected)SetWidgetBackground(selected);};
   BindCheck("QuotaCheck",()=>service.Settings.ShowAllowance,v=>service.Settings.ShowAllowance=v);
   BindCheck("AnimateCheck",()=>service.Settings.Animate,v=>{service.Settings.Animate=v;Settle();});
   BindCheck("MotionCheck",()=>service.Settings.ReduceMotion,v=>{service.Settings.ReduceMotion=v;Settle();StopEffects();});
@@ -121,9 +123,9 @@ public partial class MainWindow:Window {
   Find<Grid>("Dashboard").Background=Brush.Parse(theme.Canvas);
   foreach(var pair in new[]{("Canvas",theme.Canvas),("Surface",theme.Surface),("Text",theme.Text),("Muted",theme.Muted),("Accent",theme.Accent),("Signal",theme.Signal),("Stroke",theme.Stroke)})Resources[pair.Item1]=Brush.Parse(pair.Item2);
   foreach(string name in new[]{"Total","WidgetNumber","NumberPreview"})Find<TextBlock>(name).Foreground=Brush.Parse(theme.Accent);
-  var widget=Find<Border>("Widget");widget.Background=service.Settings.Transparent?Brushes.Transparent:Brush.Parse(theme.Surface);widget.BorderThickness=service.Settings.Transparent?new Thickness(0):new Thickness(1);
+  ApplyWidgetBackground(theme);
   foreach(string name in new[]{"TinyHide","TinyExpand","WidgetSettings","WidgetExpand","WidgetHide"}){
-   var button=Find<Button>(name);if(service.Settings.Transparent){button.Background=Brushes.Transparent;button.BorderThickness=new Thickness(0);}else{button.ClearValue(Button.BackgroundProperty);button.ClearValue(Button.BorderThicknessProperty);}
+   var button=Find<Button>(name);if(WidgetBackgroundMode!="Solid"){button.Background=Brushes.Transparent;button.BorderThickness=new Thickness(0);}else{button.ClearValue(Button.BackgroundProperty);button.ClearValue(Button.BorderThicknessProperty);}
   }
   RequestedThemeVariant=theme.Light?ThemeVariant.Light:ThemeVariant.Dark;Topmost=service.Settings.Topmost;ApplyFonts();
   foreach(var border in Find<StackPanel>("ProviderRows").Children.OfType<Border>()){border.Background=Brush.Parse(theme.Surface);foreach(var label in border.GetVisualDescendants().OfType<TextBlock>())label.Foreground=Brush.Parse(theme.Muted);}
@@ -218,7 +220,7 @@ public partial class MainWindow:Window {
     Navigate("Appearance");UpdateLayout();CaptureSurface(capture);
     SetLayout("Tiny");await Task.Delay(180);UpdateLayout();CaptureSurface(Path.Combine(Path.GetDirectoryName(capture)!,"portable-tiny.png"));
    }
-   string? report=TrackerService.Option(Program.Arguments,"--report");if(report!=null)File.WriteAllText(report,System.Text.Json.JsonSerializer.Serialize(new{Version="0.6.2",Transparency=ActualTransparencyLevel.ToString(),WindowReady=true,FontDropdownChecks=true,DashboardChecks=true,WindowTransparencyChecks=true,Layouts=Layouts,Fonts=fonts.Count,Total=service.Combined().Recorded.Total,Providers=service.Providers.Count}));
+   string? report=TrackerService.Option(Program.Arguments,"--report");if(report!=null)File.WriteAllText(report,System.Text.Json.JsonSerializer.Serialize(new{Version="0.6.3",Transparency=ActualTransparencyLevel.ToString(),WindowReady=true,FontDropdownChecks=true,DashboardChecks=true,WindowTransparencyChecks=true,WidgetBackgroundChecks=true,Layouts=Layouts,Fonts=fonts.Count,Total=service.Combined().Recorded.Total,Providers=service.Providers.Count}));
   }catch(Exception e){Console.Error.WriteLine(e);Environment.ExitCode=1;}
   finally{exiting=true;(Application.Current?.ApplicationLifetime as Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime)?.Shutdown(Environment.ExitCode);}
  }

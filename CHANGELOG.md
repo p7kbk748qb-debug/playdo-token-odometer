@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.6.3 — 2026-11-15
+
+- Added an optional Glass widget background: lightly tinted, translucent, rounded, with a subtle outline and opaque text.
+- Added Solid / Glass / Clear choices in Settings and the widget’s right-click menu, including Tiny. The choice is saved across restarts.
+- Kept existing Solid/Clear appearances for older settings, and retained the window-level transparency fix. Glass adds no animation timer or dependency.
+
 ## 0.6.2 — 2026-11-15
 
 - Fixed the window-level Canvas binding repainting transparent widgets. Regression checks now include the full window layer in all three widget modes, plus restoration of the opaque dashboard.

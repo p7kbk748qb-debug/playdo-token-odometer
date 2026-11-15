@@ -17,8 +17,9 @@ if($p.ExitCode -ne 0 -or -not (Test-Path $report)){
 }
 $state=Get-Content $report -Raw | ConvertFrom-Json
 if($state.Total -ne 397766182 -or $state.Fonts -lt 1 -or $state.Providers -ne 4 -or -not $state.WindowReady){throw 'Native desktop report did not match synthetic inputs'}
+if(-not $state.WidgetBackgroundChecks){throw 'Widget background mode checks missing'}
 if(-not $state.WindowTransparencyChecks){throw 'Window-layer transparency checks missing'}
 if(-not $state.FontDropdownChecks -or -not $state.DashboardChecks){throw 'Interactive font or dashboard regression checks missing'}
-foreach($name in @('appearance.png','appearance-overview.png','appearance-providers.png','appearance-settings.png','portable-tiny.png','window-transparent.png')){if(-not (Test-Path (Join-Path $check $name))){throw "Missing native render: $name"}}
+foreach($name in @('appearance.png','appearance-overview.png','appearance-providers.png','appearance-settings.png','portable-tiny.png','window-transparent.png','widget-glass.png')){if(-not (Test-Path (Join-Path $check $name))){throw "Missing native render: $name"}}
 "PASS native window, four layouts, provider sum, font popup recycling, dashboard, themes, reduced motion and hidden timers"
 "Evidence: $check"

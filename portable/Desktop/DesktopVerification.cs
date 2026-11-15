@@ -11,6 +11,7 @@ public partial class MainWindow {
  }
  async Task VerifyDashboard(string? capture){
   bool transparent=service.Settings.Transparent;
+  string? backgroundMode=service.Settings.WidgetBackground;service.Settings.WidgetBackground=null;
   service.Settings.Transparent=true;
   foreach(string layout in new[]{"Mini","Compact","Tiny"}){
    SetLayout(layout);await Task.Delay(80);UpdateLayout();
@@ -22,9 +23,16 @@ public partial class MainWindow {
    // Include the native control template, not only Root: it can paint behind a clear panel.
    using var windowImage=new RenderTargetBitmap(new PixelSize((int)Bounds.Width,(int)Bounds.Height),new Vector(96,96));windowImage.Render(this);windowImage.Save(Path.Combine(Path.GetDirectoryName(capture)!,"window-transparent.png"));
   }
-  service.Settings.Transparent=false;ApplyTheme();
+  SetWidgetBackground("Glass");UpdateLayout();
+  var savedBackground=System.Text.Json.JsonSerializer.Deserialize<Preferences>(File.ReadAllText(Path.Combine(service.DataFolder,"preferences.json")));
+  if(savedBackground?.WidgetBackground!="Glass")throw new Exception("Glass background choice did not persist");
+  if(Find<Border>("Widget").Background is not LinearGradientBrush glass||glass.GradientStops.Any(stop=>stop.Color.A==0||stop.Color.A==255)||Find<Border>("Widget").BorderThickness!=new Thickness(1))throw new Exception("Glass widget must have a translucent tint and outline");
+  if(Find<TextBlock>("WidgetNumber").Foreground is not ISolidColorBrush numbers||numbers.Color.A!=255)throw new Exception("Glass mode faded the counter text");
+  if(capture!=null)CaptureSurface(Path.Combine(Path.GetDirectoryName(capture)!,"widget-glass.png"));
+  SetWidgetBackground("Solid");
   if(Find<Border>("Widget").Background is not ISolidColorBrush solid||solid.Color.A!=255)throw new Exception("Solid widget did not restore opaque background");
-  service.Settings.Transparent=transparent;SetLayout("Dashboard");
+  service.Settings.Transparent=transparent;service.Settings.WidgetBackground=backgroundMode;
+  bool wasInitializing=initializing;initializing=true;Find<ComboBox>("BackgroundChoice").SelectedItem=WidgetBackgroundMode;initializing=wasInitializing;SetLayout("Dashboard");
   if(Background is not ISolidColorBrush dashboardBackground||dashboardBackground.Color.A!=255)throw new Exception("Dashboard did not restore its opaque window background");
   Navigate("Overview");Render();
   if(Find<Grid>("DayChart").Children.Count!=7||Find<Avalonia.Controls.Primitives.UniformGrid>("ProviderSummary").Children.Count!=4)throw new Exception("Dashboard chart or provider summary missing");

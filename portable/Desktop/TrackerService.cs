@@ -21,6 +21,7 @@ public sealed class Preferences {
  public string Corner {get;set;}="Free";
  public bool Topmost {get;set;}
  public bool Transparent {get;set;}
+ public string? WidgetBackground {get;set;}
  public bool Animate {get;set;}
  public bool Effects {get;set;}=true;
  public bool ReduceMotion {get;set;}

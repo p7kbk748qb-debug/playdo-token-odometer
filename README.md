@@ -6,11 +6,11 @@ Track the tools you use. Choose a look that fits your desktop. Keep the full das
 
 **Free and open source. Local records. No account keys or background AI calls.**
 
-| Download v0.6.2 | Package |
+| Download v0.6.3 | Package |
 | --- | --- |
-| [Windows x64](https://github.com/p7kbk748qb-debug/playdo-token-odometer/releases/latest/download/PlayDo-Token-Odometer-0.6.2-win-x64.zip) | Self-contained ZIP |
-| [Mac — Apple Silicon](https://github.com/p7kbk748qb-debug/playdo-token-odometer/releases/latest/download/PlayDo-Token-Odometer-0.6.2-osx-arm64.dmg) | Drag-to-Applications DMG |
-| [Mac — Intel](https://github.com/p7kbk748qb-debug/playdo-token-odometer/releases/latest/download/PlayDo-Token-Odometer-0.6.2-osx-x64.dmg) | Drag-to-Applications DMG |
+| [Windows x64](https://github.com/p7kbk748qb-debug/playdo-token-odometer/releases/latest/download/PlayDo-Token-Odometer-0.6.3-win-x64.zip) | Self-contained ZIP |
+| [Mac — Apple Silicon](https://github.com/p7kbk748qb-debug/playdo-token-odometer/releases/latest/download/PlayDo-Token-Odometer-0.6.3-osx-arm64.dmg) | Drag-to-Applications DMG |
+| [Mac — Intel](https://github.com/p7kbk748qb-debug/playdo-token-odometer/releases/latest/download/PlayDo-Token-Odometer-0.6.3-osx-x64.dmg) | Drag-to-Applications DMG |
 
 [Release notes and SHA256 checksums](https://github.com/p7kbk748qb-debug/playdo-token-odometer/releases/latest) · [Project website](https://p7kbk748qb-debug.github.io/playdo-token-odometer/) · [MIT license](LICENSE)
 
@@ -23,7 +23,7 @@ Screenshots use synthetic reports. They do not contain the owner’s usage histo
 - **Ten coordinated presets:** Graphite, Instrument, Arctic, Terminal, Winter, Hazy, Aurora, Blueprint, Sunset and Paper.
 - **Font variety:** choose installed serif, sans, monospace and display families. Every name previews its own typeface, including the selected font. Interface and number fonts are independent.
 - **Four layouts:** Dashboard, Compact, Mini and a 300 × 68 DIP Tiny counter.
-- **Desktop controls:** optional transparency, always-on-top, corner placement, and drag-to-move widgets.
+- **Desktop controls:** Solid, tinted Glass or fully Clear backgrounds, always-on-top, corner placement, and drag-to-move widgets. Change backgrounds in Settings or the widget’s right-click menu.
 - **Independent Mini/Compact contents:** allowance bars, reset times, input/output, top model and activity status.
 - **Motion you control:** optional count-up animation with a Reduce motion override. Hidden windows stop UI refresh and animation.
 - **Your providers, your total:** enable the programs you want; disable the rest. Today, 7 days, Recorded, model breakdown and CSV use that selection.
