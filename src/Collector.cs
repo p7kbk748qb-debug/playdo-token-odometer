@@ -20,10 +20,14 @@ namespace PlayDo.Odometer {
   readonly string root,cachePath,legacyPath;readonly bool claude;readonly object gate=new object();readonly AutoResetEvent wake=new AutoResetEvent(false);
   readonly HashSet<string> pending=new HashSet<string>(StringComparer.OrdinalIgnoreCase);
   readonly List<FileSystemWatcher> watchers=new List<FileSystemWatcher>();
+  readonly Func<DateTime> utcNow;readonly Action<string,SavedState> saveCheckpoint;
   SavedState state;Thread worker;volatile bool stopping,paused,reconcile=true;volatile Snapshot snapshot=new Snapshot();
   int files,processed,compressed;long bytes;bool indexing;string error="";DateTime saved=DateTime.MinValue;
   public event Action Changed;
-  public Collector(string sourceRoot,string dataFolder,bool claudeCode=false) {root=sourceRoot;claude=claudeCode;cachePath=Path.Combine(dataFolder,claude?"claude-usage-v1.db":"usage-v3.db");legacyPath=claude?null:Path.Combine(dataFolder,"usage-v2.db");}
+  public Collector(string sourceRoot,string dataFolder,bool claudeCode=false):this(sourceRoot,dataFolder,claudeCode,()=>DateTime.UtcNow,Store.Save) {}
+  // Synthetic tests control timing and persistence failures without changing production paths or data.
+  internal Collector(string sourceRoot,string dataFolder,Func<DateTime> clock,Action<string,SavedState> persist):this(sourceRoot,dataFolder,false,clock,persist) {}
+  internal Collector(string sourceRoot,string dataFolder,bool claudeCode,Func<DateTime> clock,Action<string,SavedState> persist) {root=sourceRoot;claude=claudeCode;cachePath=Path.Combine(dataFolder,claude?"claude-usage-v1.db":"usage-v3.db");legacyPath=claude?null:Path.Combine(dataFolder,"usage-v2.db");utcNow=clock;saveCheckpoint=persist;}
   string[] Folders(){return claude?new[]{"projects"}:new[]{"sessions","archived_sessions"};}
   public Snapshot GetSnapshot(){return snapshot;}
   public void Start() {worker=new Thread(Run){IsBackground=true,Name="PlayDo usage collector",Priority=ThreadPriority.BelowNormal};worker.Start();}
@@ -62,7 +66,7 @@ namespace PlayDo.Odometer {
     long before=cursor.ReadBytes;cursor.Read(p,line=>{if(claude)state.Ledger.AcceptClaude(id,line);else state.Ledger.Accept(id,line);},claude?1048576:262144,()=>stopping||paused);bytes+=cursor.ReadBytes-before;
    }catch(DatabaseException){error="Local usage cache is busy. This record will be retried.";lock(gate)pending.Add(p);}catch(IOException){error="A session file is busy; retrying automatically.";}catch(UnauthorizedAccessException){error="A session file could not be read.";}
   }
-  void Checkpoint(bool force) {if(!force&&(DateTime.UtcNow-saved).TotalSeconds<10)return;try{Store.Save(cachePath,state);saved=DateTime.UtcNow;}catch(Exception e){if(e is IOException||e is UnauthorizedAccessException||e is InvalidOperationException||e is DatabaseException)error="Cannot save local cache. Check free disk space and folder access.";else throw;}}
+  bool Checkpoint(bool force) {if(!force&&(utcNow()-saved).TotalSeconds<10)return false;try{saveCheckpoint(cachePath,state);saved=utcNow();return true;}catch(Exception e){if(e is IOException||e is UnauthorizedAccessException||e is InvalidOperationException||e is DatabaseException)error="Cannot save local cache. Check free disk space and folder access.";else throw;}return false;}
   void Run() {
    try {
     while(state==null&&!stopping){try{state=Store.Load(cachePath,legacyPath);}catch{snapshot=new Snapshot {Status="Cannot open local cache. Check folder access; retrying in 5 seconds."};var changed=Changed;if(changed!=null)changed();wake.WaitOne(5000);}}
@@ -70,15 +74,15 @@ namespace PlayDo.Odometer {
     DateTime next=DateTime.MinValue;long priorBytes=-1;
     while(!stopping) {
      if(paused){if(!snapshot.Paused)Publish();wake.WaitOne();continue;}
-     if(reconcile||DateTime.UtcNow>=next) {
+     if(reconcile||utcNow()>=next) {
       reconcile=false;Watch();var paths=Discover();files=paths.Count;processed=0;indexing=true;Publish();
       foreach(string p in paths){if(stopping||paused){reconcile=true;break;}Process(p);processed++;Publish();Thread.Sleep(2);}
-      indexing=false;next=DateTime.UtcNow.AddSeconds(60);Publish();
+      indexing=false;next=utcNow().AddSeconds(60);Publish();
      }
      string[] batch;lock(gate){batch=pending.ToArray();pending.Clear();}
      foreach(string p in batch)Process(p);
      if(batch.Length>0)Publish();
-     if(bytes!=priorBytes){Checkpoint(false);if((DateTime.UtcNow-saved).TotalSeconds<1)priorBytes=bytes;}
+     if(bytes!=priorBytes&&Checkpoint(false))priorBytes=bytes;
      wake.WaitOne(650);
     }
     Checkpoint(true);

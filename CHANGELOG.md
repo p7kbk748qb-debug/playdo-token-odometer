@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Fixed a throttled checkpoint incorrectly marking new usage clean before it reached disk. Pending progress now retries automatically after throttling or a failed save, without another usage event. Regression tests cover durable totals and warm restart.
+
 - Made transparent widget mode background-free rather than 80% opaque, including its border and action-button fills. Widget tooltips identify the selected period and providers.
 
 - Fixed square backing corners on Windows desktop widgets by matching the native window region to the rounded panel. Dashboard windows restore their normal shape.
