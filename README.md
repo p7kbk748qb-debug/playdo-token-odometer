@@ -8,11 +8,11 @@ Track the tools you use. Choose a look that fits your desktop. Keep the full das
 
 | Download v0.6.3 | Package |
 | --- | --- |
-| [Windows x64](https://github.com/p7kbk748qb-debug/playdo-token-odometer/releases/latest/download/PlayDo-Token-Odometer-0.6.3-win-x64.zip) | Self-contained ZIP |
-| [Mac — Apple Silicon](https://github.com/p7kbk748qb-debug/playdo-token-odometer/releases/latest/download/PlayDo-Token-Odometer-0.6.3-osx-arm64.dmg) | Drag-to-Applications DMG |
-| [Mac — Intel](https://github.com/p7kbk748qb-debug/playdo-token-odometer/releases/latest/download/PlayDo-Token-Odometer-0.6.3-osx-x64.dmg) | Drag-to-Applications DMG |
+| [Windows x64](https://github.com/p7kbk748qb-debug/playdo-token-odometer/releases/download/v0.6.3/PlayDo-Token-Odometer-0.6.3-win-x64.zip) | Self-contained ZIP |
+| [Mac — Apple Silicon](https://github.com/p7kbk748qb-debug/playdo-token-odometer/releases/download/v0.6.3/PlayDo-Token-Odometer-0.6.3-osx-arm64.dmg) | Drag-to-Applications DMG |
+| [Mac — Intel](https://github.com/p7kbk748qb-debug/playdo-token-odometer/releases/download/v0.6.3/PlayDo-Token-Odometer-0.6.3-osx-x64.dmg) | Drag-to-Applications DMG |
 
-[Release notes and SHA256 checksums](https://github.com/p7kbk748qb-debug/playdo-token-odometer/releases/latest) · [Project website](https://p7kbk748qb-debug.github.io/playdo-token-odometer/) · [MIT license](LICENSE)
+[Release notes and SHA256 checksums](https://github.com/p7kbk748qb-debug/playdo-token-odometer/releases/tag/v0.6.3) · [Project website](https://p7kbk748qb-debug.github.io/playdo-token-odometer/) · [MIT license](LICENSE)
 
 ![The charcoal instrument-panel dashboard showing synthetic usage](https://raw.githubusercontent.com/p7kbk748qb-debug/playdo-token-odometer/main/assets/screenshots/desktop-overview.png)
 

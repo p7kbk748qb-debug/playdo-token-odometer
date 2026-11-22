@@ -1,4 +1,6 @@
-# Install PlayDo's Token Odometer
+# Install legacy PlayDo Token Odometer v0.5.0 (Windows)
+
+This archived guide is for the older Windows-only app. For the current portable app, see the [Windows guide](../portable/WINDOWS-INSTALL.md) or the [macOS guide](../portable/MACOS-INSTALL.md).
 
 ## Requirements
 
@@ -6,7 +8,7 @@ Windows 10 or 11 x64, .NET Framework 4.8 and a local Codex or Claude Code instal
 
 ## Portable package
 
-1. Download [PlayDo-Token-Odometer-0.5.0-windows-x64.zip](https://github.com/p7kbk748qb-debug/playdo-token-odometer/releases/latest/download/PlayDo-Token-Odometer-0.5.0-windows-x64.zip) and its `.sha256` file from the [official project releases](https://github.com/p7kbk748qb-debug/playdo-token-odometer/releases/latest).
+1. Download [PlayDo-Token-Odometer-0.5.0-windows-x64.zip](https://github.com/p7kbk748qb-debug/playdo-token-odometer/releases/download/v0.5.0/PlayDo-Token-Odometer-0.5.0-windows-x64.zip) and its [SHA256 checksum](https://github.com/p7kbk748qb-debug/playdo-token-odometer/releases/download/v0.5.0/PlayDo-Token-Odometer-0.5.0-windows-x64.zip.sha256) from the [v0.5.0 release](https://github.com/p7kbk748qb-debug/playdo-token-odometer/releases/tag/v0.5.0).
 2. Optionally verify the download in PowerShell:
 
    ```powershell
