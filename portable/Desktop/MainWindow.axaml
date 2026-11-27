@@ -1,27 +1,42 @@
-<Window xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" x:Class="PlayDo.Desktop.MainWindow"
+<Window xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:local="using:PlayDo.Desktop" x:Class="PlayDo.Desktop.MainWindow"
  Title="PlayDo’s Token Odometer" Width="1080" Height="780" MinWidth="760" MinHeight="540" Background="Transparent" WindowStartupLocation="CenterScreen"
  TransparencyLevelHint="Transparent" Icon="/Assets/app.ico">
  <!-- ApplyTheme owns window paint; a Canvas resource binding can repaint transparent widgets. -->
  <Grid x:Name="Root">
   <Grid x:Name="Dashboard" ColumnDefinitions="184,*">
    <Border Background="{DynamicResource Surface}" BorderBrush="{DynamicResource Stroke}" BorderThickness="0,0,1,0" Padding="16,24"><DockPanel>
-    <StackPanel DockPanel.Dock="Top" Spacing="2" Margin="0,0,0,28"><Image Source="/Assets/app-icon.png" Width="32" Height="32" HorizontalAlignment="Left" Margin="10,0,0,12"/><TextBlock Text="Token" FontSize="20" FontWeight="SemiBold" Margin="10,0"/><TextBlock Text="Odometer" FontSize="20" FontWeight="SemiBold" Margin="10,0"/><TextBlock Text="by PlayDo" Classes="muted" FontSize="11" Margin="10,6"/></StackPanel>
-    <StackPanel DockPanel.Dock="Bottom" Spacing="10"><TextBlock Text="On your desktop" Classes="muted" FontSize="11" Margin="8,0"/><UniformGrid Columns="2"><Button x:Name="QuickMini" Content="Mini" Margin="0,0,4,0" Padding="6,8"/><Button x:Name="QuickTiny" Content="Tiny" Margin="4,0,0,0" Padding="6,8"/></UniformGrid><TextBlock Text="Local records.&#10;Private by default." Classes="muted" FontSize="11" LineHeight="18" Margin="8,4"/></StackPanel>
-    <StackPanel><Button x:Name="OverviewNav" Classes="rail" ><StackPanel Orientation="Horizontal" Spacing="12"><Path Data="M1,1 H7 V7 H1 Z M11,1 H17 V7 H11 Z M1,11 H7 V17 H1 Z M11,11 H17 V17 H11 Z" Width="16" Height="16" Stretch="Uniform" Stroke="{DynamicResource Muted}" StrokeThickness="1.4"/><TextBlock Text="Overview"/></StackPanel></Button><Button x:Name="ProvidersNav" Classes="rail" ><StackPanel Orientation="Horizontal" Spacing="12"><Path Data="M6,1 V6 M12,1 V6 M3,6 H15 V9 A6,6 0 0 1 9,15 V18 M9,15 A6,6 0 0 1 3,9" Width="16" Height="16" Stretch="Uniform" Stroke="{DynamicResource Muted}" StrokeThickness="1.4"/><TextBlock Text="Providers"/></StackPanel></Button><Button x:Name="AppearanceNav" Classes="rail" ><StackPanel Orientation="Horizontal" Spacing="12"><Path Data="M3,2 H15 V7 H3 Z M15,4 H18 V10 H9 V16 M7,16 H11 V19 H7 Z" Width="16" Height="16" Stretch="Uniform" Stroke="{DynamicResource Muted}" StrokeThickness="1.4"/><TextBlock Text="Appearance"/></StackPanel></Button><Button x:Name="SettingsNav" Classes="rail" ><StackPanel Orientation="Horizontal" Spacing="12"><Path Data="M1,4 H17 M1,10 H17 M1,16 H17 M5,1 V7 M13,7 V13 M7,13 V19" Width="16" Height="16" Stretch="Uniform" Stroke="{DynamicResource Muted}" StrokeThickness="1.4"/><TextBlock Text="Settings"/></StackPanel></Button></StackPanel>
+    <Grid DockPanel.Dock="Top" ColumnDefinitions="32,10,*" Margin="6,0,0,34">
+     <Image Source="/Assets/app-icon.png" Width="32" Height="32" VerticalAlignment="Center"/>
+     <StackPanel Grid.Column="2" Spacing="3"><TextBlock Text="PlayDo’s" Classes="muted" FontSize="11"/><TextBlock Text="Token Odometer" FontSize="14" FontWeight="SemiBold" TextWrapping="Wrap"/></StackPanel>
+    </Grid>
+    <Border DockPanel.Dock="Bottom" BorderBrush="{DynamicResource Stroke}" BorderThickness="0,1,0,0" Padding="0,16,0,0">
+     <StackPanel Spacing="9"><TextBlock Text="Desktop widgets" Classes="muted" FontSize="12" Margin="4,0"/>
+      <UniformGrid Columns="2"><Button x:Name="QuickMini" Content="Mini" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Margin="0,0,3,0"/><Button x:Name="QuickTiny" Content="Tiny" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Margin="3,0,0,0"/></UniformGrid>
+     </StackPanel>
+    </Border>
+    <StackPanel><Button x:Name="OverviewNav" AutomationProperties.Name="Overview" Classes="rail" ><StackPanel Orientation="Horizontal" Spacing="12"><Path Data="M1,1 H7 V7 H1 Z M11,1 H17 V7 H11 Z M1,11 H7 V17 H1 Z M11,11 H17 V17 H11 Z" Width="16" Height="16" Stretch="Uniform" Stroke="{DynamicResource Muted}" StrokeThickness="1.4"/><TextBlock Text="Overview"/></StackPanel></Button><Button x:Name="ProvidersNav" AutomationProperties.Name="Providers" Classes="rail" ><StackPanel Orientation="Horizontal" Spacing="12"><Path Data="M6,1 V6 M12,1 V6 M3,6 H15 V9 A6,6 0 0 1 9,15 V18 M9,15 A6,6 0 0 1 3,9" Width="16" Height="16" Stretch="Uniform" Stroke="{DynamicResource Muted}" StrokeThickness="1.4"/><TextBlock Text="Providers"/></StackPanel></Button><Button x:Name="AppearanceNav" AutomationProperties.Name="Appearance" Classes="rail" ><StackPanel Orientation="Horizontal" Spacing="12"><Path Data="M3,2 H15 V7 H3 Z M15,4 H18 V10 H9 V16 M7,16 H11 V19 H7 Z" Width="16" Height="16" Stretch="Uniform" Stroke="{DynamicResource Muted}" StrokeThickness="1.4"/><TextBlock Text="Appearance"/></StackPanel></Button><Button x:Name="SettingsNav" AutomationProperties.Name="Settings" Classes="rail" ><StackPanel Orientation="Horizontal" Spacing="12"><Path Data="M1,4 H17 M1,10 H17 M1,16 H17 M5,1 V7 M13,7 V13 M7,13 V19" Width="16" Height="16" Stretch="Uniform" Stroke="{DynamicResource Muted}" StrokeThickness="1.4"/><TextBlock Text="Settings"/></StackPanel></Button></StackPanel>
    </DockPanel></Border>
    <ScrollViewer x:Name="PageScroll" Grid.Column="1" Padding="30,28" HorizontalScrollBarVisibility="Disabled">
     <StackPanel x:Name="PageContent" Spacing="24">
-     <Grid ColumnDefinitions="*,Auto"><StackPanel><TextBlock x:Name="PageTitle" Text="Usage overview" Classes="heading"/><TextBlock x:Name="PageSubtitle" Text="Your selected tools, in one counter." Classes="muted" Margin="0,6,0,0"/></StackPanel><ComboBox x:Name="LayoutChoice" Grid.Column="1" Width="132" VerticalAlignment="Center" AutomationProperties.Name="Window layout"/></Grid>
+     <Grid ColumnDefinitions="*,Auto"><StackPanel Margin="0,0,12,0"><TextBlock x:Name="PageTitle" Text="Usage overview" Classes="heading"/><TextBlock x:Name="PageSubtitle" Text="Observed usage across your selected tools." TextWrapping="Wrap" Classes="muted" Margin="0,6,0,0"/></StackPanel><ComboBox x:Name="LayoutChoice" Grid.Column="1" Width="132" VerticalAlignment="Center" AutomationProperties.Name="Window layout"/></Grid>
      <StackPanel x:Name="OverviewPage" Spacing="18">
-      <Grid ColumnDefinitions="*,Auto"><StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center"><Ellipse Width="6" Height="6" Fill="{DynamicResource Signal}"/><TextBlock x:Name="Status" Classes="muted" FontSize="12" TextWrapping="Wrap" MaxWidth="290"/></StackPanel><ComboBox x:Name="ScopeChoice" Grid.Column="1" Width="138" AutomationProperties.Name="Token period"/></Grid>
-      <StackPanel Spacing="10">
-       <TextBlock x:Name="ScopeLabel" Text="Today’s tokens" Classes="muted" FontSize="13"/>
-       <Viewbox Height="64" Stretch="Uniform" StretchDirection="DownOnly" HorizontalAlignment="Left"><TextBlock x:Name="Total" Text="—" FontSize="68" FontWeight="Medium" Foreground="{DynamicResource Accent}"/></Viewbox>
-       <Grid ColumnDefinitions="*,Auto"><TextBlock x:Name="SourceSummary" Classes="muted" TextWrapping="Wrap" FontSize="12" VerticalAlignment="Center" Margin="0,0,12,0"/><StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8"><Button x:Name="CopyButton" Content="Copy total"/><Button x:Name="ExportButton" Content="Export CSV"/></StackPanel></Grid>
-      </StackPanel>
-      <Border BorderBrush="{DynamicResource Stroke}" BorderThickness="0,1" Padding="0,12">
-       <Grid ColumnDefinitions="*,*,*"><StackPanel Spacing="5"><TextBlock Text="Input" Classes="muted" FontSize="12"/><TextBlock x:Name="InputValue" FontSize="24"/></StackPanel><StackPanel Grid.Column="1" Spacing="5"><TextBlock Text="Output" Classes="muted" FontSize="12"/><TextBlock x:Name="OutputValue" FontSize="24"/></StackPanel><StackPanel Grid.Column="2" Spacing="5"><TextBlock Text="Cached input" Classes="muted" FontSize="12"/><TextBlock x:Name="CacheValue" FontSize="24"/><TextBlock x:Name="CacheShare" Classes="muted" FontSize="11"/></StackPanel></Grid>
+      <Border Classes="panel" Padding="0" ClipToBounds="True">
+       <Grid RowDefinitions="Auto,Auto"><local:MeterFace x:Name="DashboardFace"/>
+       <StackPanel Spacing="10" Margin="22,18,22,12">
+        <Grid ColumnDefinitions="*,Auto"><TextBlock x:Name="ScopeLabel" Text="Today’s tokens" FontSize="16" FontWeight="SemiBold" VerticalAlignment="Center"/><ComboBox x:Name="ScopeChoice" Grid.Column="1" Width="138" AutomationProperties.Name="Token period"/></Grid>
+        <Viewbox Height="76" Stretch="Uniform" StretchDirection="DownOnly" HorizontalAlignment="Left"><TextBlock x:Name="Total" Text="—" FontSize="76" FontWeight="Medium" Foreground="{DynamicResource Accent}"/></Viewbox>
+        <Grid ColumnDefinitions="Auto,8,*"><Ellipse Width="6" Height="6" Fill="{DynamicResource Signal}" VerticalAlignment="Center"/><TextBlock Grid.Column="2" x:Name="Status" Classes="muted" FontSize="12" TextWrapping="Wrap"/></Grid>
+        </StackPanel>
+        <Border Grid.Row="1" BorderBrush="{DynamicResource Stroke}" BorderThickness="0,1,0,0" Padding="22,12,22,16">
+         <Grid ColumnDefinitions="*,*,*">
+          <StackPanel Spacing="3"><TextBlock Text="Input" Classes="muted" FontSize="12"/><TextBlock x:Name="InputValue" FontSize="24"/></StackPanel>
+          <StackPanel Grid.Column="1" Spacing="3"><TextBlock Text="Output" Classes="muted" FontSize="12"/><TextBlock x:Name="OutputValue" FontSize="24"/></StackPanel>
+          <StackPanel Grid.Column="2" Spacing="3"><TextBlock Text="Cached input" Classes="muted" FontSize="12"/><TextBlock x:Name="CacheValue" FontSize="24"/><TextBlock x:Name="CacheShare" Classes="muted" FontSize="11"/></StackPanel>
+         </Grid>
+        </Border>
+       </Grid>
       </Border>
+      <Grid ColumnDefinitions="*,Auto"><TextBlock x:Name="SourceSummary" Margin="0,0,12,0" Classes="muted" TextWrapping="Wrap" FontSize="12" VerticalAlignment="Center"/><StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8"><Button x:Name="CopyButton" Content="Copy total"/><Button x:Name="ExportButton" Content="Export CSV"/></StackPanel></Grid>
       <UniformGrid x:Name="ProviderSummary" Columns="4"/>
       <Grid x:Name="AnalyticsGrid" ColumnDefinitions="1.4*,20,*" RowDefinitions="Auto,Auto">
        <Border x:Name="ChartPanel" Classes="panel" Padding="20"><StackPanel Spacing="14"><Grid ColumnDefinitions="*,Auto"><TextBlock Text="Last seven days" FontSize="16" FontWeight="SemiBold"/><TextBlock x:Name="ChartTotal" Grid.Column="1" Classes="muted" VerticalAlignment="Center" FontSize="11"/></Grid><Grid x:Name="DayChart" Height="170"/><TextBlock x:Name="ChartNote" Classes="muted" FontSize="11" TextWrapping="Wrap"/></StackPanel></Border>
@@ -37,21 +52,47 @@
       <Border Classes="panel"><StackPanel Spacing="8"><TextBlock Text="Other AI apps" FontWeight="SemiBold"/><TextBlock Text="Web chats and apps that don’t expose local token reports cannot be counted reliably. This release does not read browser sessions, collect account keys, or estimate usage from message length." Classes="muted" TextWrapping="Wrap"/></StackPanel></Border>
      </StackPanel>
      <StackPanel x:Name="AppearancePage" IsVisible="False" Spacing="20">
-      <Grid ColumnDefinitions="*,16,*"><StackPanel Spacing="8"><TextBlock Text="Interface font" FontWeight="Medium"/><ComboBox x:Name="InterfaceFont" HorizontalAlignment="Stretch" AutomationProperties.Name="Interface font"/></StackPanel><StackPanel Grid.Column="2" Spacing="8"><TextBlock Text="Number font" FontWeight="Medium"/><ComboBox x:Name="CounterFont" HorizontalAlignment="Stretch" AutomationProperties.Name="Number font"/></StackPanel></Grid>
-      <Border Classes="panel" Padding="16"><StackPanel Spacing="8"><Viewbox Height="46" Stretch="Uniform" StretchDirection="DownOnly" HorizontalAlignment="Left"><TextBlock x:Name="NumberPreview" Text="396,659,182" FontSize="48" Foreground="{DynamicResource Accent}"/></Viewbox><TextBlock x:Name="FontNote" Classes="muted" TextWrapping="Wrap"/></StackPanel></Border>
-      <StackPanel Spacing="6"><TextBlock Text="Choose a starting point" FontSize="17" FontWeight="SemiBold"/><TextBlock Text="Themes apply a full palette and font pair. Fine-tune either font above." Classes="muted" TextWrapping="Wrap"/></StackPanel>
+      <Grid x:Name="StudioEditor" ColumnDefinitions="*,16,*">
+      <Border Classes="panel" Padding="0" ClipToBounds="True">
+       <Grid ColumnDefinitions="5,*"><local:MeterFace x:Name="StudioFace" Grid.Column="1"/><Border Background="{DynamicResource NumberInkBrush}"/>
+        <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="18,14" Spacing="6">
+         <Grid ColumnDefinitions="*,Auto"><TextBlock x:Name="PreviewHeading" Text="Sample counter" FontWeight="SemiBold"/><TextBlock Grid.Column="1" x:Name="PreviewPalette" Classes="muted"/></Grid>
+         <Viewbox Height="60" Stretch="Uniform" StretchDirection="DownOnly" HorizontalAlignment="Left"><TextBlock x:Name="NumberPreview" Text="12,345,678" FontSize="60" Foreground="{DynamicResource NumberInkBrush}"/></Viewbox>
+         <TextBlock x:Name="FontNote" Classes="muted" TextWrapping="Wrap"/>
+        </StackPanel>
+       </Grid>
+      </Border>
+      <Grid x:Name="StudioControls" Grid.Column="2" RowDefinitions="Auto,12,Auto" ColumnDefinitions="*,12,*">
+       <StackPanel Spacing="6"><TextBlock Text="Interface font"/><ComboBox x:Name="InterfaceFont" HorizontalAlignment="Stretch" AutomationProperties.Name="Interface font"/></StackPanel>
+       <StackPanel Grid.Column="2" Spacing="6"><TextBlock Text="Number font"/><ComboBox x:Name="CounterFont" HorizontalAlignment="Stretch" AutomationProperties.Name="Number font"/></StackPanel>
+       <StackPanel Grid.Row="2" Spacing="6"><TextBlock Text="Number ink"/><ComboBox x:Name="NumberInk" HorizontalAlignment="Stretch" AutomationProperties.Name="Number ink"/></StackPanel>
+       <StackPanel Grid.Row="2" Grid.Column="2" Spacing="6"><TextBlock Text="Face detail"/><ComboBox x:Name="FaceDetail" HorizontalAlignment="Stretch" AutomationProperties.Name="Face detail"/></StackPanel>
+      </Grid>
+      </Grid>
+      <StackPanel Spacing="8"><Grid x:Name="SaveLookRow" ColumnDefinitions="Auto,16,*"><TextBlock Text="Saved looks" VerticalAlignment="Center" FontSize="18" FontWeight="SemiBold"/>
+       <Grid x:Name="SaveLookForm" Grid.Column="2" ColumnDefinitions="*,8,Auto"><TextBox Background="{DynamicResource Surface}" Foreground="{DynamicResource Text}" BorderBrush="{DynamicResource Stroke}" CornerRadius="8" VerticalContentAlignment="Center" x:Name="LookName" Watermark="Name this look" MaxLength="48" AutomationProperties.Name="Name this look"/><Button Grid.Column="2" x:Name="SaveLook" Content="Save look"/></Grid></Grid>
+       <Grid x:Name="LookActions" ColumnDefinitions="*,8,Auto,8,Auto"><ComboBox x:Name="SavedLooks" HorizontalAlignment="Stretch" AutomationProperties.Name="Saved look"/><Button Grid.Column="2" x:Name="ApplyLook" Content="Apply"/><Button Grid.Column="4" x:Name="RemoveLook" Content="Remove"/></Grid>
+       <TextBlock x:Name="LookStatus" IsVisible="False" Classes="muted" TextWrapping="Wrap" AutomationProperties.LiveSetting="Polite"/>
+      </StackPanel>
+      <StackPanel Spacing="6"><TextBlock Text="Preset gallery" FontSize="18" FontWeight="SemiBold"/><TextBlock Text="Choose a palette and its matching typefaces." Classes="muted"/></StackPanel>
       <UniformGrid x:Name="ThemeGallery" Columns="3"/>
-      <CheckBox x:Name="AnimateCheck" Content="Animate token increases"/><CheckBox x:Name="EffectsCheck" Content="Interface transitions and chart effects"/><CheckBox x:Name="MotionCheck" Content="Reduce motion"/>
+      <StackPanel Spacing="4"><TextBlock Text="Motion" FontSize="18" FontWeight="SemiBold"/><CheckBox x:Name="AnimateCheck" Content="Animate token increases"/><CheckBox x:Name="EffectsCheck" Content="Interface transitions and chart effects"/><CheckBox x:Name="MotionCheck" Content="Reduce motion"/></StackPanel>
      </StackPanel>
      <StackPanel x:Name="SettingsPage" IsVisible="False" Spacing="18">
-      <TextBlock Text="Desktop widget" FontSize="17" FontWeight="SemiBold"/>
-      <CheckBox x:Name="TopmostCheck" Content="Keep the widget above other windows"/>
-      <CheckBox x:Name="PauseCheck" Content="Pause collection (resume catches up)"/>
-      <StackPanel Spacing="8"><TextBlock Text="Widget background"/><ComboBox x:Name="BackgroundChoice" Width="220" HorizontalAlignment="Left" AutomationProperties.Name="Widget background"/><TextBlock Text="Solid panel, tinted glass, or fully clear. Text stays opaque." Classes="muted" FontSize="12" TextWrapping="Wrap"/></StackPanel>
-      <CheckBox x:Name="QuotaCheck" Content="Show Codex allowance in Mini and Compact"/>
-      <StackPanel Spacing="10"><TextBlock Text="Mini &amp; Compact content" FontSize="16" FontWeight="SemiBold"/><ComboBox x:Name="WidgetOptionsChoice" Width="200" HorizontalAlignment="Left" AutomationProperties.Name="Widget to configure"/><StackPanel x:Name="WidgetOptionRows" Spacing="8"/></StackPanel>
-      <StackPanel Spacing="8"><TextBlock Text="Screen corner"/><ComboBox x:Name="CornerChoice" Width="200" HorizontalAlignment="Left" AutomationProperties.Name="Screen corner"/></StackPanel>
-      <Border Classes="panel"><StackPanel Spacing="8"><TextBlock Text="Local data" FontSize="16" FontWeight="SemiBold"/><TextBlock x:Name="DataPath" Classes="muted" TextWrapping="Wrap"/><TextBlock Text="The data folder holds aggregate counts, settings, and hashed replay metadata. It does not store your conversation bodies." Classes="muted" TextWrapping="Wrap"/><Button x:Name="DataButton" Content="Open data folder" HorizontalAlignment="Left"/></StackPanel></Border>
+      <Border Classes="panel"><StackPanel Spacing="14">
+       <TextBlock Text="Desktop widget" FontSize="17" FontWeight="SemiBold"/>
+       <Grid ColumnDefinitions="*,16,*">
+        <StackPanel Spacing="6"><TextBlock Text="Widget background" Classes="muted"/><ComboBox x:Name="BackgroundChoice" HorizontalAlignment="Stretch" AutomationProperties.Name="Widget background"/></StackPanel>
+        <StackPanel Grid.Column="2" Spacing="6"><TextBlock Text="Screen corner" Classes="muted"/><ComboBox x:Name="CornerChoice" HorizontalAlignment="Stretch" AutomationProperties.Name="Screen corner"/></StackPanel>
+       </Grid>
+       <CheckBox x:Name="TopmostCheck" Content="Keep the widget above other windows"/>
+       <CheckBox x:Name="QuotaCheck" Content="Show Codex allowance in Mini and Compact"/>
+      </StackPanel></Border>
+      <Border Classes="panel"><StackPanel Spacing="12">
+       <Grid ColumnDefinitions="*,Auto"><TextBlock Text="Mini &amp; Compact content" FontSize="16" FontWeight="SemiBold" VerticalAlignment="Center"/><ComboBox Grid.Column="1" x:Name="WidgetOptionsChoice" Width="132" AutomationProperties.Name="Widget to configure"/></Grid>
+       <StackPanel x:Name="WidgetOptionRows" Spacing="6"/>
+      </StackPanel></Border>
+      <Border Classes="panel"><StackPanel Spacing="8"><TextBlock Text="Local data" FontSize="16" FontWeight="SemiBold"/><CheckBox x:Name="PauseCheck" Content="Pause collection (resume catches up)"/><TextBlock x:Name="DataPath" Classes="muted" TextWrapping="Wrap"/><TextBlock Text="The data folder holds aggregate counts, settings, and hashed replay metadata. It does not store your conversation bodies." Classes="muted" TextWrapping="Wrap"/><Button x:Name="DataButton" Content="Open data folder" HorizontalAlignment="Left"/></StackPanel></Border>
       <TextBlock Text="Close the window to keep tracking in the menu bar or system tray. Use Exit to stop the collector. Drag widgets by the number or background; right-click to change views." Classes="muted" TextWrapping="Wrap"/>
       <Button x:Name="ExitButton" Content="Exit application" HorizontalAlignment="Left"/>
      </StackPanel>

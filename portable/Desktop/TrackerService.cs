@@ -10,11 +10,16 @@ public sealed class WidgetOptions {
  public bool ShowModel {get;set;}
  public bool ShowStatus {get;set;}=true;
 }
+public sealed record AppearanceLook(string Name,string Theme,string Font,string NumberFont,string? NumberInk,string? FaceDetail=null);
+
 public sealed class Preferences {
  public WidgetOptions Mini {get;set;}=new();
  public WidgetOptions Compact {get;set;}=new(){ShowReset=true,ShowBreakdown=true,ShowModel=true};
  public string Theme {get;set;}="Graphite";
  public string Font {get;set;}="Inter";
+ public string? FaceDetail {get;set;}
+ public string? NumberInk {get;set;}
+ public List<AppearanceLook>? SavedLooks {get;set;}
  public string NumberFont {get;set;}="Inter";
  public string Layout {get;set;}="Dashboard";
  public string Scope {get;set;}="Today";
@@ -83,10 +88,13 @@ public sealed class TrackerService:IDisposable {
   else{p.External=new ExternalCollector(provider,root,DataFolder);p.External.Enable(Settings.Enabled.GetValueOrDefault(provider)&&!Settings.Paused);if(started)p.External.Start();}
   Note="Folder saved. New reports will be added to the existing provider history.";
  }
- public void Save(){
+ public bool Save(){
   string temporary=settingsPath+".tmp";
-  try{File.WriteAllText(temporary,JsonSerializer.Serialize(Settings,new JsonSerializerOptions{WriteIndented=true}));File.Move(temporary,settingsPath,true);Note="";}
-  catch(IOException){Note="Could not save preferences. Check the data folder permissions.";}catch(UnauthorizedAccessException){Note="Could not save preferences. Check the data folder permissions.";}
+  try{File.WriteAllText(temporary,JsonSerializer.Serialize(Settings,new JsonSerializerOptions{WriteIndented=true}));File.Move(temporary,settingsPath,true);Note="";return true;}
+  catch(Exception error) when(error is IOException or UnauthorizedAccessException){
+   Note="Could not save preferences. Check that the data folder is writable and has free space, then retry.";
+   return false;
+  }
  }
  public Snapshot Combined(){
   var s=new Snapshot{Status="No providers selected"};int count=0;

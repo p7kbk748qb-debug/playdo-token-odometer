@@ -6,13 +6,13 @@ Track the tools you use. Choose a look that fits your desktop. Keep the full das
 
 **Free and open source. Local records. No account keys or background AI calls.**
 
-| Download v0.6.3 | Package |
+| Download v0.7.0 | Package |
 | --- | --- |
-| [Windows x64](https://github.com/p7kbk748qb-debug/playdo-token-odometer/releases/download/v0.6.3/PlayDo-Token-Odometer-0.6.3-win-x64.zip) | Self-contained ZIP |
-| [Mac — Apple Silicon](https://github.com/p7kbk748qb-debug/playdo-token-odometer/releases/download/v0.6.3/PlayDo-Token-Odometer-0.6.3-osx-arm64.dmg) | Drag-to-Applications DMG |
-| [Mac — Intel](https://github.com/p7kbk748qb-debug/playdo-token-odometer/releases/download/v0.6.3/PlayDo-Token-Odometer-0.6.3-osx-x64.dmg) | Drag-to-Applications DMG |
+| [Windows x64](https://github.com/p7kbk748qb-debug/playdo-token-odometer/releases/download/v0.7.0/PlayDo-Token-Odometer-0.7.0-win-x64.zip) | Self-contained ZIP |
+| [Mac — Apple Silicon](https://github.com/p7kbk748qb-debug/playdo-token-odometer/releases/download/v0.7.0/PlayDo-Token-Odometer-0.7.0-osx-arm64.dmg) | Drag-to-Applications DMG |
+| [Mac — Intel](https://github.com/p7kbk748qb-debug/playdo-token-odometer/releases/download/v0.7.0/PlayDo-Token-Odometer-0.7.0-osx-x64.dmg) | Drag-to-Applications DMG |
 
-[Release notes and SHA256 checksums](https://github.com/p7kbk748qb-debug/playdo-token-odometer/releases/tag/v0.6.3) · [Project website](https://p7kbk748qb-debug.github.io/playdo-token-odometer/) · [MIT license](LICENSE)
+[Release notes and SHA256 checksums](https://github.com/p7kbk748qb-debug/playdo-token-odometer/releases/tag/v0.7.0) · [Project website](https://p7kbk748qb-debug.github.io/playdo-token-odometer/) · [MIT license](LICENSE)
 
 ![The charcoal instrument-panel dashboard showing synthetic usage](https://raw.githubusercontent.com/p7kbk748qb-debug/playdo-token-odometer/main/assets/screenshots/desktop-overview.png)
 
@@ -21,6 +21,8 @@ Screenshots use synthetic reports. They do not contain the owner’s usage histo
 ## Make it yours
 
 - **Ten coordinated presets:** Graphite, Instrument, Arctic, Terminal, Winter, Hazy, Aurora, Blueprint, Sunset and Paper.
+- **Saved looks.** Open Appearance, choose a preset, then set the interface font, number font, number ink and face detail. Give the combination a name and choose **Save look**. Select a saved look and choose **Apply** to bring it back.
+- **Counter faces.** Use the preset’s finish or choose Plain, Scale, Grid, Rules or Dots on the dashboard. Number ink also carries into Compact, Mini and Tiny.
 - **Font variety:** choose installed serif, sans, monospace and display families. Every name previews its own typeface, including the selected font. Interface and number fonts are independent.
 - **Four layouts:** Dashboard, Compact, Mini and a 300 × 68 DIP Tiny counter.
 - **Desktop controls:** Solid, tinted Glass or fully Clear backgrounds, always-on-top, corner placement, and drag-to-move widgets. Change backgrounds in Settings or the widget’s right-click menu.

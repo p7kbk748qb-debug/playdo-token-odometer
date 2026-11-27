@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.7.0 — 2026-11-27
+
+- Added named looks to Appearance. Each look stores a base preset, two typefaces, number ink and a counter-face finish. Apply or remove looks from the same screen.
+- Added five independent number colors with light and dark variants, plus Plain, Scale, Grid, Rules and Dots for the dashboard face. Each built-in preset has a default finish. The preview follows each edit.
+- Redesigned the usage readout, provider contributions and widget settings, and updated the public screenshots with synthetic reports.
+- Older preferences load with their existing settings. Choosing an appearance only changes the visual selections. Recording history, provider selection, widget layout and motion controls retain their own settings.
+
 ## 0.6.3 — 2026-11-15
 
 - Added an optional Glass widget background: lightly tinted, translucent, rounded, with a subtle outline and opaque text.

@@ -65,12 +65,12 @@ public partial class MainWindow:Window {
   BindCheck("MotionCheck",()=>service.Settings.ReduceMotion,v=>{service.Settings.ReduceMotion=v;Settle();StopEffects();});
   BindCheck("EffectsCheck",()=>service.Settings.Effects,v=>{service.Settings.Effects=v;if(!v)StopEffects();});
   Find<TextBlock>("DataPath").Text=service.DataFolder;
-  BuildProviders();BuildThemes();BuildFonts();BuildWidgetSettings();ApplyTheme();
+  BuildProviders();BuildFonts();BuildThemes();BuildWidgetSettings();ApplyTheme();
   refresh.Tick+=(_,_)=>Render();
   motion.Tick+=(_,_)=>{double t=Math.Clamp(clock.Elapsed.TotalMilliseconds/300,0,1);shown=from+(long)(((decimal)target-from)*(decimal)(1-Math.Pow(1-t,3)));Paint(shown);if(t>=1)motion.Stop();};
   Opened+=(_,_)=>{SetLayout(service.Settings.Layout);Render();if(Program.Arguments.Contains("--smoke")&&!Program.Arguments.Contains("--inspect"))DispatcherTimer.RunOnce(()=>FinishSmoke(),TimeSpan.FromSeconds(4));};
   KeyDown+=(_,e)=>{if((e.KeyModifiers&(KeyModifiers.Control|KeyModifiers.Meta))==0)return;if(e.Key==Key.T){SetLayout("Tiny");e.Handled=true;}if(e.Key==Key.Escape){SetLayout("Dashboard");e.Handled=true;}};
-  SizeChanged+=(_,_)=>{Find<UniformGrid>("ThemeGallery").Columns=Bounds.Width<900?2:3;ArrangeAnalytics();UpdateWindowShape();};
+  SizeChanged+=(_,_)=>{Find<UniformGrid>("ThemeGallery").Columns=Bounds.Width<900?2:3;ArrangeStudio();ArrangeAnalytics();UpdateWindowShape();};
   PropertyChanged+=(_,e)=>{if(e.Property.Name==nameof(RenderScaling))UpdateWindowShape();};
   effects.Tick+=(_,_)=>StepEffects();
   initializing=false;refresh.Start();
@@ -80,20 +80,23 @@ public partial class MainWindow:Window {
   bool changed=page!=name;page=name;foreach(string p in new[]{"Overview","Providers","Appearance","Settings"}){Find<StackPanel>(p+"Page").IsVisible=p==name;Find<Button>(p+"Nav").Background=p==name?ThemeBrush("Canvas"):Brushes.Transparent;}
   if(changed){Find<Button>(name+"Nav").Focus();Find<ScrollViewer>("PageScroll").Offset=default;}
   Find<TextBlock>("PageTitle").Text=name=="Overview"?"Overview":name;
-  Find<TextBlock>("PageSubtitle").Text=name switch{"Overview"=>"Your selected tools, in one counter.","Providers"=>"Count the tools you use. Keep the rest off.","Appearance"=>"Build a look that fits your desktop.",_=>"Small windows. Local data. Your choices."};Render();if(changed)StartEffects(true);
+  Find<TextBlock>("PageSubtitle").Text=name switch{"Overview"=>"Observed usage across your selected tools.","Providers"=>"Choose which local reports contribute to your total.","Appearance"=>"Build a look that fits your desktop.",_=>"Configure desktop widgets and local collection."};Render();if(changed)StartEffects(true);
  }
  void BuildProviders(){
   var panel=Find<StackPanel>("ProviderRows");
   foreach(var provider in service.Providers){
-   var body=new StackPanel{Spacing=8};var checkbox=new CheckBox{Content=provider.Name,FontSize=17,FontWeight=FontWeight.Medium,IsChecked=service.Settings.Enabled.GetValueOrDefault(provider.Name)};body.Children.Add(checkbox);
+   var body=new StackPanel{Spacing=10};
+   var header=new Grid{ColumnDefinitions=new ColumnDefinitions("*,16,*")};body.Children.Add(header);
+   var checkbox=new CheckBox{Content=provider.Name,FontSize=17,FontWeight=FontWeight.Medium,IsChecked=service.Settings.Enabled.GetValueOrDefault(provider.Name)};header.Children.Add(checkbox);
    body.Children.Add(Label(provider.Description,12,"#A9B6C6"));
-   var status=Label(provider.Detected?"Detected on this computer":"Not detected · choose a folder or launch the tool",12,"#76D8E5");providerStatus[provider.Name]=status;body.Children.Add(status);
-   var folder=new TextBlock{Text=provider.Root,FontSize=11,TextWrapping=TextWrapping.Wrap,Foreground=Brush.Parse("#A9B6C6")};body.Children.Add(folder);
+   var status=Label(provider.Detected?"Detected on this computer":"Not detected · choose a folder or launch the tool",12,"#76D8E5");providerStatus[provider.Name]=status;status.HorizontalAlignment=Avalonia.Layout.HorizontalAlignment.Right;status.VerticalAlignment=Avalonia.Layout.VerticalAlignment.Center;status.TextWrapping=TextWrapping.Wrap;Grid.SetColumn(status,2);header.Children.Add(status);
+   var folder=new TextBlock{Text=provider.Root,FontSize=12,TextWrapping=TextWrapping.Wrap};folder.Classes.Add("muted");
+   body.Children.Add(new Border{Child=folder,Classes={"pathWell"}});
    var actions=new StackPanel{Orientation=Avalonia.Layout.Orientation.Horizontal,Spacing=8};var choose=new Button{Content="Choose folder"};var check=new Button{Content="Check for reports"};actions.Children.Add(choose);actions.Children.Add(check);body.Children.Add(actions);
    checkbox.IsCheckedChanged+=(_,_)=>{service.Select(provider.Name,checkbox.IsChecked==true);Render();};
    check.Click+=(_,_)=>{service.Refresh();Render();};
    choose.Click+=async(_,_)=>{var folders=await StorageProvider.OpenFolderPickerAsync(new FolderPickerOpenOptions{Title="Select "+provider.Name+" home folder",AllowMultiple=false});if(folders.Count>0){string? path=folders[0].TryGetLocalPath();if(path!=null){try{service.SetRoot(provider.Name,path);folder.Text=path;Find<TextBlock>("Feedback").Text=service.Note;}catch(IOException){Find<TextBlock>("Feedback").Text="The previous collector is still finishing a read. Try again after it stops.";}}}};
-   panel.Children.Add(new Border{Child=body,Background=Brush.Parse("#20262F"),CornerRadius=new CornerRadius(10),Padding=new Thickness(20)});
+   panel.Children.Add(new Border{Child=body,Classes={"panel"}});
   }
  }
  static FontFamily TypefaceFamily(string name)=>new(name=="Inter"?"fonts:Inter#Inter":name);
@@ -112,17 +115,16 @@ public partial class MainWindow:Window {
   Find<ComboBox>("CounterFont").SelectionChanged+=(_,_)=>{if(initializing||Find<ComboBox>("CounterFont").SelectedItem is not FontOption font)return;service.Settings.NumberFont=font.Name;service.Save();ApplyFonts();};
  }
  void SyncFonts(){Find<ComboBox>("InterfaceFont").SelectedItem=fonts.FirstOrDefault(x=>x.Name==service.Settings.Font)??fonts[0];Find<ComboBox>("CounterFont").SelectedItem=fonts.FirstOrDefault(x=>x.Name==service.Settings.NumberFont)??fonts[0];}
- void ApplyFonts(){FontFamily=TypefaceFamily(service.Settings.Font);foreach(string name in new[]{"Total","WidgetNumber","NumberPreview"})Find<TextBlock>(name).FontFamily=TypefaceFamily(service.Settings.NumberFont);Find<TextBlock>("FontNote").Text=service.Settings.Font+" · "+service.Settings.NumberFont+" · "+fonts.Count+" font choices. Each name previews its typeface.";}
- void BuildThemes(){
-  foreach(var theme in Themes.All){var body=new StackPanel{Spacing=7};body.Children.Add(new TextBlock{Text=theme.Name,FontFamily=TypefaceFamily(theme.Font),FontSize=17,FontWeight=FontWeight.Medium,Foreground=Brush.Parse(theme.Text)});body.Children.Add(new TextBlock{Text="12,345,678",FontFamily=TypefaceFamily(theme.Numbers),FontSize=24,Foreground=Brush.Parse(theme.Accent)});var button=new Button{Content=body,Background=Brush.Parse(theme.Surface),Margin=new Thickness(0,0,12,12),Padding=new Thickness(16,12),HorizontalAlignment=Avalonia.Layout.HorizontalAlignment.Stretch,VerticalAlignment=Avalonia.Layout.VerticalAlignment.Stretch,MinHeight=106};button.Click+=(_,_)=>{service.Settings.Theme=theme.Name;service.Settings.Font=ResolveFont(theme.Font);service.Settings.NumberFont=ResolveFont(theme.Numbers);service.Save();bool was=initializing;initializing=true;SyncFonts();initializing=was;ApplyTheme();};Find<UniformGrid>("ThemeGallery").Children.Add(button);}
- }
  string ResolveFont(string name)=>fonts.Any(f=>f.Name==name)?name:"Inter";
  void ApplyTheme(){
   var theme=Themes.All.FirstOrDefault(t=>t.Name==service.Settings.Theme)??Themes.All[0];
   Background=service.Settings.Layout=="Dashboard"?Brush.Parse(theme.Canvas):Brushes.Transparent;Foreground=Brush.Parse(theme.Text);
   Find<Grid>("Dashboard").Background=Brush.Parse(theme.Canvas);
   foreach(var pair in new[]{("Canvas",theme.Canvas),("Surface",theme.Surface),("Text",theme.Text),("Muted",theme.Muted),("Accent",theme.Accent),("Signal",theme.Signal),("Stroke",theme.Stroke)})Resources[pair.Item1]=Brush.Parse(pair.Item2);
-  foreach(string name in new[]{"Total","WidgetNumber","NumberPreview"})Find<TextBlock>(name).Foreground=Brush.Parse(theme.Accent);
+  foreach(string name in new[]{"Total","WidgetNumber","NumberPreview"})Find<TextBlock>(name).Foreground=Brush.Parse(EffectiveInk(theme,service.Settings.NumberInk));
+  Resources["NumberInkBrush"]=Brush.Parse(EffectiveInk(theme,service.Settings.NumberInk));
+  Find<TextBlock>("PreviewPalette").Text=theme.Name;
+  ApplyFaceDetail(theme);
   ApplyWidgetBackground(theme);
   foreach(string name in new[]{"TinyHide","TinyExpand","WidgetSettings","WidgetExpand","WidgetHide"}){
    var button=Find<Button>(name);if(WidgetBackgroundMode!="Solid"){button.Background=Brushes.Transparent;button.BorderThickness=new Thickness(0);}else{button.ClearValue(Button.BackgroundProperty);button.ClearValue(Button.BorderThicknessProperty);}
@@ -130,7 +132,7 @@ public partial class MainWindow:Window {
   RequestedThemeVariant=theme.Light?ThemeVariant.Light:ThemeVariant.Dark;Topmost=service.Settings.Topmost;ApplyFonts();
   foreach(var border in Find<StackPanel>("ProviderRows").Children.OfType<Border>()){border.Background=Brush.Parse(theme.Surface);foreach(var label in border.GetVisualDescendants().OfType<TextBlock>())label.Foreground=Brush.Parse(theme.Muted);}
   foreach(var status in providerStatus.Values)status.Foreground=Brush.Parse(theme.Signal);
-  foreach(var button in Find<UniformGrid>("ThemeGallery").Children.OfType<Button>()){button.BorderThickness=new Thickness(2);button.BorderBrush=button.Content is StackPanel body&&body.Children[0] is TextBlock title&&title.Text==theme.Name?Brush.Parse(theme.Accent):Brushes.Transparent;}
+  UpdateGallery(theme);
   foreach(string name in new[]{"Overview","Providers","Appearance","Settings"})Find<Button>(name+"Nav").Background=name==page?Brush.Parse(theme.Canvas):Brushes.Transparent;
   lastModels="";lastQuota="";
  }
@@ -186,7 +188,10 @@ public partial class MainWindow:Window {
   if(quota==null||quota.Windows.Count==0)return "Not reported locally yet";
   return string.Join(" · ",quota.Windows.Select(q=>(q.Minutes==300?"5-hour":q.Minutes==10080?"Weekly":q.Minutes+" min")+": "+(Expired(q)?"awaiting update":(100-q.Used).ToString("0.#")+"% remaining")))+((DateTime.UtcNow-quota.At.ToUniversalTime()).TotalMinutes>15?" · older snapshot":"");
  }
- void Paint(long value,bool has=true){string text=has?value.ToString("N0"):"—";Find<TextBlock>("Total").Text=text;Find<TextBlock>("WidgetNumber").Text=text;}
+ void Paint(long value,bool has=true){string text=has?value.ToString("N0"):"—";Find<TextBlock>("Total").Text=text;Find<TextBlock>("WidgetNumber").Text=text;
+  Find<TextBlock>("NumberPreview").Text=has?text:"12,345,678";
+  Find<TextBlock>("PreviewHeading").Text=has?"Counter preview":"Sample counter";
+ }
  void Settle(){motion.Stop();shown=target;Paint(target,hasNumber);}
  async Task Copy(){if(Clipboard!=null){await Clipboard.SetTextAsync(Current(service.Combined()).Total.ToString("N0"));Find<TextBlock>("Feedback").Text="Copied the selected total";}}
  async Task Export(){var file=await StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions{Title="Export aggregate usage",SuggestedFileName="PlayDo-tokens-"+DateTime.Today.ToString("yyyy-MM-dd")+".csv",FileTypeChoices=new[]{new FilePickerFileType("CSV"){Patterns=new[]{"*.csv"}}}});if(file==null)return;try{await using var stream=await file.OpenWriteAsync();using var writer=new StreamWriter(stream,new UTF8Encoding(true));await writer.WriteAsync(Convenience.Csv(service.Combined(),service.Settings.Scope));Find<TextBlock>("Feedback").Text="CSV saved";}catch(IOException){Find<TextBlock>("Feedback").Text="Could not save CSV. Choose another folder.";}}
@@ -220,7 +225,7 @@ public partial class MainWindow:Window {
     Navigate("Appearance");UpdateLayout();CaptureSurface(capture);
     SetLayout("Tiny");await Task.Delay(180);UpdateLayout();CaptureSurface(Path.Combine(Path.GetDirectoryName(capture)!,"portable-tiny.png"));
    }
-   string? report=TrackerService.Option(Program.Arguments,"--report");if(report!=null)File.WriteAllText(report,System.Text.Json.JsonSerializer.Serialize(new{Version="0.6.3",Transparency=ActualTransparencyLevel.ToString(),WindowReady=true,FontDropdownChecks=true,DashboardChecks=true,WindowTransparencyChecks=true,WidgetBackgroundChecks=true,Layouts=Layouts,Fonts=fonts.Count,Total=service.Combined().Recorded.Total,Providers=service.Providers.Count}));
+   string? report=TrackerService.Option(Program.Arguments,"--report");if(report!=null)File.WriteAllText(report,System.Text.Json.JsonSerializer.Serialize(new{Version="0.7.0",Transparency=ActualTransparencyLevel.ToString(),WindowReady=true,FontDropdownChecks=true,DashboardChecks=true,WindowTransparencyChecks=true,WidgetBackgroundChecks=true,AppearanceStudioChecks=true,Layouts=Layouts,Fonts=fonts.Count,Total=service.Combined().Recorded.Total,Providers=service.Providers.Count}));
   }catch(Exception e){Console.Error.WriteLine(e);Environment.ExitCode=1;}
   finally{exiting=true;(Application.Current?.ApplicationLifetime as Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime)?.Shutdown(Environment.ExitCode);}
  }

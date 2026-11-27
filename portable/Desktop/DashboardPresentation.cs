@@ -13,7 +13,6 @@ public partial class MainWindow {
  readonly System.Diagnostics.Stopwatch effectClock=new();
  readonly List<ScaleTransform> chartScales=new();bool fading,chartAnimating;
  IBrush ThemeBrush(string key)=>Resources.TryGetResource(key,ActualThemeVariant,out var brush)?(IBrush)brush!:Foreground!;
- IBrush SurfaceBrush()=>ThemeBrush("Surface");
  void ArrangeAnalytics(){
   if(!IsInitialized)return;
   bool wide=Bounds.Width>=1000&&service.Settings.Enabled.GetValueOrDefault("Codex");
@@ -26,10 +25,10 @@ public partial class MainWindow {
   var providers=Find<UniformGrid>("ProviderSummary");providers.Children.Clear();
   foreach(var provider in service.Providers){
    bool on=service.Settings.Enabled.GetValueOrDefault(provider.Name);var data=provider.Snapshot;var value=Convenience.Total(data,service.Settings.Scope);
-   var text=new StackPanel{Spacing=6};text.Children.Add(Label(provider.Name,12,"#A9B6C6"));
-   text.Children.Add(new TextBlock{Text=on?value.Total.ToString("N0"):"Off",FontSize=18,FontWeight=FontWeight.Medium,Foreground=on?Foreground:ThemeBrush("Muted"),TextTrimming=TextTrimming.CharacterEllipsis});
+   var text=new StackPanel{Spacing=4};text.Children.Add(Label(provider.Name,13));
+   text.Children.Add(new TextBlock{Text=on?value.Total.ToString("N0"):"Off",FontSize=20,FontWeight=FontWeight.Medium,Foreground=on?Foreground:ThemeBrush("Muted"),TextTrimming=TextTrimming.CharacterEllipsis});
    text.Children.Add(Label(on?(data.Indexing?"Importing":data.Recorded.Total>0?"tokens":"Awaiting reports"):"Not counted",10,"#A9B6C6"));
-   var button=new Button{Content=text,HorizontalAlignment=HorizontalAlignment.Stretch,HorizontalContentAlignment=HorizontalAlignment.Left,Padding=new Thickness(12),Margin=new Thickness(0,0,8,8),Background=SurfaceBrush(),BorderThickness=new Thickness(0)};
+   var button=new Button{Content=text,HorizontalAlignment=HorizontalAlignment.Stretch,HorizontalContentAlignment=HorizontalAlignment.Left,Padding=new Thickness(12),Margin=new Thickness(0,0,8,8),Background=Brushes.Transparent,BorderBrush=ThemeBrush("Stroke"),BorderThickness=new Thickness(0,1,0,0),CornerRadius=new CornerRadius(0)};
    ToolTip.SetTip(button,provider.Name+" · "+(on?value.Total.ToString("N0")+" tokens · "+data.Status:"Not selected")+". Open provider settings.");
    button.Click+=(_,_)=>Navigate("Providers");providers.Children.Add(button);
   }
@@ -59,8 +58,8 @@ public partial class MainWindow {
    var day=days[i];long amount=day.tokens?.Total??0;var column=new Grid{RowDefinitions=new RowDefinitions("Auto,*,Auto"),Margin=new Thickness(3,0)};
    var value=Label(amount>0?Short(amount):"—",10,"#A9B6C6");value.HorizontalAlignment=HorizontalAlignment.Center;column.Children.Add(value);
    var scale=new ScaleTransform(1,1);chartScales.Add(scale);
-   var track=new Border{Background=ThemeBrush("Stroke"),Opacity=.22,CornerRadius=new CornerRadius(4),Margin=new Thickness(9,8,9,8)};Grid.SetRow(track,1);column.Children.Add(track);
-   var bar=new Border{Height=amount>0?Math.Max(3,116.0*amount/Math.Max(1,max)):0,Background=ThemeBrush(i==6?"Accent":"Signal"),CornerRadius=new CornerRadius(4),VerticalAlignment=VerticalAlignment.Bottom,Margin=new Thickness(9,8,9,8),RenderTransform=scale,RenderTransformOrigin=new RelativePoint(.5,1,RelativeUnit.Relative)};Grid.SetRow(bar,1);column.Children.Add(bar);
+   var track=new Border{Background=ThemeBrush("Stroke"),Opacity=.14,CornerRadius=new CornerRadius(2),Margin=new Thickness(6,8,6,8)};Grid.SetRow(track,1);column.Children.Add(track);
+   var bar=new Border{Height=amount>0?Math.Max(3,116.0*amount/Math.Max(1,max)):0,Background=ThemeBrush(i==6?"Accent":"Signal"),CornerRadius=new CornerRadius(2),VerticalAlignment=VerticalAlignment.Bottom,Margin=new Thickness(6,8,6,8),RenderTransform=scale,RenderTransformOrigin=new RelativePoint(.5,1,RelativeUnit.Relative)};Grid.SetRow(bar,1);column.Children.Add(bar);
    var label=Label(i==6?"Today":day.date.ToString("ddd"),10,"#A9B6C6");label.HorizontalAlignment=HorizontalAlignment.Center;Grid.SetRow(label,2);column.Children.Add(label);
    ToolTip.SetTip(column,day.date.ToString("D")+" · "+(day.tokens==null?"No local report":amount.ToString("N0")+" observed tokens"));
    Avalonia.Automation.AutomationProperties.SetName(column,day.date.ToString("D")+", "+amount.ToString("N0")+" observed tokens");

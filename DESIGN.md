@@ -98,6 +98,10 @@ Controls use the control radius, panels the panel radius, and desktop widgets th
 
 ## Components
 
+**Appearance studio.** The counter specimen previews the effective palette, typefaces, number ink and face detail. The preset gallery shows the palette and type in each tile. Saved looks store just these visual choices. Their application, and a visit to the studio itself, must preserve recording, layout, widget background, corner, motion and provider settings.
+
+**Readout face.** The dashboard and specimen share a static native print behind the number. Graphite, Instrument and Arctic use dial graduations. Winter and Blueprint use a drafting grid. Terminal and Aurora use dots. Paper and Sunset use rules. Hazy leaves the print plain. A user can override the print independently of the palette. Widgets carry the chosen ink and number font into their existing Solid, Glass or Clear surround.
+
 **Desktop views.** Preserve Dashboard, Compact, Mini and Tiny. Tiny is a 300 × 68 DIP number-first, borderless, draggable view with small hide/expand actions. Mini and Compact retain independent content choices. Widget backgrounds offer Solid, Glass and Clear. Glass uses a static theme-tinted gradient at 100/255 to 55/255 alpha with a subtle 1 DIP outline; text stays opaque. Clear removes the background, border and action-button fills. The background choice is available in Settings and the widget’s right-click menu; legacy transparency preferences retain their previous appearance.
 
 **Observed usage.** The daily chart uses actual selected-provider aggregates. A missing report is distinct from a verified observation; tooltip and coverage text retain that boundary. Model rows pair exact counts with relative share and expand beyond the initial five. Cached input remains a subset of input.
