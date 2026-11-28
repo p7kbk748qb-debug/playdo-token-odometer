@@ -6,11 +6,15 @@ Track the tools you use. Choose a look that fits your desktop. Keep the full das
 
 **Free and open source. Local records. No account keys or background AI calls.**
 
-| Download v0.7.0 | Package |
-| --- | --- |
-| [Windows x64](https://github.com/p7kbk748qb-debug/playdo-token-odometer/releases/download/v0.7.0/PlayDo-Token-Odometer-0.7.0-win-x64.zip) | Self-contained ZIP |
-| [Mac — Apple Silicon](https://github.com/p7kbk748qb-debug/playdo-token-odometer/releases/download/v0.7.0/PlayDo-Token-Odometer-0.7.0-osx-arm64.dmg) | Drag-to-Applications DMG |
-| [Mac — Intel](https://github.com/p7kbk748qb-debug/playdo-token-odometer/releases/download/v0.7.0/PlayDo-Token-Odometer-0.7.0-osx-x64.dmg) | Drag-to-Applications DMG |
+## Download and install
+
+**[Get the latest release](https://github.com/p7kbk748qb-debug/playdo-token-odometer/releases/latest)** or download **v0.7.0 · Appearance Studio** for your computer below.
+
+| Platform | Download | Install |
+| --- | --- | --- |
+| Windows x64 | [Download Windows ZIP](https://github.com/p7kbk748qb-debug/playdo-token-odometer/releases/download/v0.7.0/PlayDo-Token-Odometer-0.7.0-win-x64.zip) | Extract the entire ZIP, then open `PlayDoTokenOdometer.exe`. |
+| macOS 15+ · Apple Silicon | [Download Apple Silicon DMG](https://github.com/p7kbk748qb-debug/playdo-token-odometer/releases/download/v0.7.0/PlayDo-Token-Odometer-0.7.0-osx-arm64.dmg) | Open the DMG and drag the app to Applications. |
+| macOS 15+ · Intel | [Download Intel Mac DMG](https://github.com/p7kbk748qb-debug/playdo-token-odometer/releases/download/v0.7.0/PlayDo-Token-Odometer-0.7.0-osx-x64.dmg) | Open the DMG and drag the app to Applications. |
 
 [Release notes and SHA256 checksums](https://github.com/p7kbk748qb-debug/playdo-token-odometer/releases/tag/v0.7.0) · [Project website](https://p7kbk748qb-debug.github.io/playdo-token-odometer/) · [MIT license](LICENSE)
 
